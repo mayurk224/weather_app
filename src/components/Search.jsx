@@ -22,7 +22,7 @@ const Search = ({ onWeatherData }) => {
       setResults(cities);
       setLoading(false);
       setShowSuggestions(true);
-    }, 500); // debounce 0.5s
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
   }, [query]);
@@ -45,10 +45,22 @@ const Search = ({ onWeatherData }) => {
     setShowSuggestions(false);
 
     const { latitude, longitude } = city;
+
+    // Save to localStorage
+    localStorage.setItem(
+      "lastCity",
+      JSON.stringify({
+        name: city.name,
+        country: city.country,
+        lat: latitude,
+        lon: longitude,
+      })
+    );
+
     const weather = await getWeatherData(latitude, longitude);
 
     if (onWeatherData) {
-      onWeatherData(weather); // pass data to parent
+      onWeatherData({ city, weather });
     }
   };
 
@@ -116,7 +128,7 @@ const Search = ({ onWeatherData }) => {
           )}
         </div>
 
-        {/* Keep button for manual search if needed */}
+        {/* Search button fallback */}
         <button
           className="bg-[#4455daff] hover:bg-[#2d1c9cff] text-white rounded-lg px-4 py-3 w-full lg:w-auto lg:min-w-[120px]"
           onClick={async () => {

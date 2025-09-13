@@ -8,11 +8,24 @@ const GEO_BASE_URL = "https://geocoding-api.open-meteo.com/v1/search";
  */
 export const getWeatherData = async (latitude, longitude) => {
   try {
+    // If latitude & longitude not provided, try localStorage
+    if (!latitude || !longitude) {
+      const lastCity = localStorage.getItem("lastCity");
+
+      if (lastCity) {
+        const { lat, lon } = JSON.parse(lastCity);
+        latitude = lat;
+        longitude = lon;
+      } else {
+        throw new Error("No coordinates provided and no last city found");
+      }
+    }
+
     const params = new URLSearchParams({
       latitude,
       longitude,
       daily: "temperature_2m_min,temperature_2m_max,weather_code",
-      hourly: "temperature_2m",
+      hourly: "temperature_2m,weather_code",
       current:
         "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m",
       timezone: "auto",

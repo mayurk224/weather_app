@@ -15,3 +15,28 @@ body {
   background-color: #03012dff;
   font-family: "DM Sans", sans-serif;
 }
+
+.hourlyContainer {
+  scrollbar-width: thin;
+  /* Firefox */
+  scrollbar-color: #3d3b5e #272541;
+}
+
+/* Chrome, Edge, Safari */
+.hourlyContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.hourlyContainer::-webkit-scrollbar-track {
+  background: #272541;
+  border-radius: 10px;
+}
+
+.hourlyContainer::-webkit-scrollbar-thumb {
+  background-color: #3d3b5e;
+  border-radius: 10px;
+}
+
+.hourlyContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #4a4768;
+}
