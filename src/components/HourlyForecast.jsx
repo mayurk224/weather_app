@@ -19,7 +19,7 @@ export default function HourlyForecast({ data, loading, units }) {
   const [groupedData, setGroupedData] = useState({});
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // State for dropdown
 
   useEffect(() => {
     if (!data?.time || !data?.temperature_2m) return;
@@ -31,9 +31,11 @@ export default function HourlyForecast({ data, loading, units }) {
     data.time.forEach((timeStr, idx) => {
       const date = new Date(timeStr);
       const key = date.toISOString().split("T")[0]; // YYYY-MM-DD
-      const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+      const weekday =
+        date.toDateString() === now.toDateString()
+          ? "Today"
+          : date.toLocaleDateString("en-US", { weekday: "long" });
 
-      // For today, only include upcoming hours
       const isToday = date.toDateString() === now.toDateString();
       if (isToday && date.getHours() <= now.getHours()) return;
 
@@ -58,35 +60,37 @@ export default function HourlyForecast({ data, loading, units }) {
     setGroupedData(grouped);
     setDays(dayLabels);
     if (dayLabels.length > 0) setSelectedDay(dayLabels[0]);
-  }, [data, units.temperature]); // Add units.temperature to dependency array
+  }, [data, units.temperature]);
 
+  // Handler for dropdown selection
   const handleSelect = (dayKey) => {
     setSelectedDay(dayKey);
     setIsOpen(false);
   };
 
-  // Skeleton loader
   const SkeletonCard = () => (
-    <div className="flex items-center justify-between bg-[#312f4bff] border border-gray-600 rounded-lg px-4 py-3 animate-pulse">
+    <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#312f4bff] px-4 py-3 animate-pulse">
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-gray-700 rounded-full"></div>
-        <div className="w-16 h-5 bg-gray-700 rounded"></div>
+        <div className="h-10 w-10 rounded-full bg-gray-700"></div>
+        <div className="h-5 w-16 rounded bg-gray-700"></div>
       </div>
-      <div className="w-8 h-5 bg-gray-700 rounded"></div>
+      <div className="h-5 w-8 rounded bg-gray-700"></div>
     </div>
   );
 
   const tempUnit = getTemperatureUnit(units.temperature);
 
   return (
-    <div className="mt-10 lg:mt-0 bg-[#272541ff] rounded-lg lg:w-1/3 w-full">
+    <div className="mt-10 w-full rounded-lg bg-[#272541ff] h-[650px] lg:mt-0">
+      {/* Header with Title and Dropdown */}
       <div className="flex items-center justify-between p-5">
-        <h2 className="text-white text-lg font-medium">Hourly forecast</h2>
-        {/* Day Selector */}
+        <h2 className="text-lg font-medium text-white">Hourly forecast</h2>
+
+        {/* Original Dropdown Selector */}
         <div className="relative inline-block text-left">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center bg-[#312f4bff] border border-gray-600 rounded-lg px-3 py-2 text-white hover:bg-[#3d3b5eff] transition-colors"
+            className="flex items-center rounded-lg border border-gray-600 bg-[#312f4bff] px-3 py-2 text-white transition-colors hover:bg-[#3d3b5eff]"
           >
             <span className="text-sm font-medium">
               {groupedData[selectedDay]?.label || "Loading..."}
@@ -94,18 +98,18 @@ export default function HourlyForecast({ data, loading, units }) {
             <img
               src="src/assets/icon-dropdown.svg"
               alt="Dropdown"
-              className={`w-4 h-4 ml-1 text-gray-300 transition-transform ${
+              className={`ml-1 h-4 w-4 text-gray-300 transition-transform ${
                 isOpen ? "rotate-180" : ""
               }`}
             />
           </button>
           {isOpen && (
-            <ul className="absolute right-0 mt-1 w-40 bg-[#312f4bff] border border-gray-600 rounded-lg shadow-lg z-10">
+            <ul className="absolute right-0 z-10 mt-1 w-40 rounded-lg border border-gray-600 bg-[#312f4bff] shadow-lg">
               {days.map((dayKey) => (
                 <li
                   key={dayKey}
                   onClick={() => handleSelect(dayKey)}
-                  className="px-3 py-2 text-sm text-white hover:bg-[#3d3b5eff] cursor-pointer"
+                  className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-[#3d3b5eff]"
                 >
                   {groupedData[dayKey].label}
                 </li>
@@ -115,7 +119,8 @@ export default function HourlyForecast({ data, loading, units }) {
         </div>
       </div>
 
-      <div className="hourlyContainer space-y-2 rounded-t-lg rounded-b-lg max-h-[80vh] overflow-y-auto pl-5 pr-3 pb-5 lg:h-[77vh]">
+      {/* Improved: Adaptive Height Container */}
+      <div className="hourlyContainer space-y-2 overflow-y-auto h-[560px] rounded-b-lg pr-4 pl-5 py-5">
         {loading
           ? Array(6)
               .fill(0)
@@ -123,15 +128,19 @@ export default function HourlyForecast({ data, loading, units }) {
           : groupedData[selectedDay]?.hours.map((hour, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between bg-[#312f4bff] hover:bg-[#3d3b5eff] border border-gray-600 rounded-lg px-4 py-3"
+                className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#312f4bff] px-4 py-3 transition-colors hover:bg-[#3d3b5eff]"
               >
                 <div className="flex items-center space-x-3">
-                  <img src={hour.icon} alt="icon" className="w-10 h-10" />
-                  <span className="text-white text-lg font-medium">
+                  <img
+                    src={hour.icon}
+                    alt="weather icon"
+                    className="h-10 w-10"
+                  />
+                  <span className="text-lg font-medium text-white">
                     {hour.time}
                   </span>
                 </div>
-                <span className="text-white text-md font-semibold">
+                <span className="text-md font-semibold text-white">
                   {hour.temp}
                   {tempUnit}
                 </span>

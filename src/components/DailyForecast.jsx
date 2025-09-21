@@ -1,7 +1,7 @@
 import React from "react";
 import { convertTemperature, getTemperatureUnit } from "../utils/units";
 
-// Map weather code to icon name
+// Map weather code to icon name (No changes needed here)
 const getIconName = (code) => {
   if ([0, 1].includes(code)) return "sunny";
   if ([2].includes(code)) return "partly-cloudy";
@@ -15,24 +15,31 @@ const getIconName = (code) => {
 };
 
 const DailyForecast = ({ data, loading, units }) => {
-  // Skeleton component
+  // Skeleton component - Updated to be flexible
   const SkeletonCard = () => (
-    <div className="bg-[#272541ff] lg:p-3 p-2 rounded-lg flex flex-col items-center space-y-3 animate-pulse">
-      <div className="h-4 w-12 "></div>
-      <div className="w-20 h-20"></div>
-      <div className="flex items-center justify-between w-full text-white text-sm space-x-2">
-        <div className="h-4 w-10 "></div>
-        <div className="h-4 w-10 "></div>
+    <div className="flex animate-pulse flex-col items-center space-y-2 rounded-lg bg-[#272541ff] p-3">
+      {/* REMOVED: Fixed h-4, w-12. Let the skeleton mimic the text size. */}
+      <div className="h-5 w-14 rounded bg-gray-700"></div>
+      {/* REMOVED: Wrapper div. Size the image skeleton directly. */}
+      <div className="h-16 w-16 rounded-full bg-gray-700"></div>
+      <div className="flex w-full justify-between pt-1">
+        {/* REMOVED: Fixed h-4, w-10. */}
+        <div className="h-5 w-10 rounded bg-gray-700"></div>
+        <div className="h-5 w-10 rounded bg-gray-700"></div>
       </div>
     </div>
   );
 
-  // Show skeletons when loading
+  // Consistent grid classes for loading and loaded states
+  const gridClasses =
+    "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-4";
+
   if (loading) {
     return (
       <div className="mt-10 space-y-5">
-        <h1 className="text-white text-2xl font-bold">Daily Forecast</h1>
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+        <h1 className="text-2xl font-bold text-white">Daily Forecast</h1>
+        {/* CHANGED: Grid classes now match the data grid to prevent layout shift */}
+        <div className={gridClasses}>
           {Array.from({ length: 7 }).map((_, idx) => (
             <SkeletonCard key={idx} />
           ))}
@@ -41,19 +48,17 @@ const DailyForecast = ({ data, loading, units }) => {
     );
   }
 
-  // Ensure data and its properties are available before mapping
   if (!data || !data.time || data.time.length === 0) {
-    return null; // Or show "No data available"
+    return null;
   }
 
   const tempUnit = getTemperatureUnit(units.temperature);
 
   return (
     <div className="mt-10 space-y-5">
-      <h1 className="text-white text-2xl font-bold">Daily Forecast</h1>
+      <h1 className="text-2xl font-bold text-white">Daily Forecast</h1>
 
-      {/* Responsive grid for forecast items */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className={gridClasses}>
         {data.time.map((dateStr, idx) => {
           const dateObj = new Date(dateStr);
           const day = dateObj.toLocaleDateString("en-US", { weekday: "short" });
@@ -74,31 +79,29 @@ const DailyForecast = ({ data, loading, units }) => {
           return (
             <div
               key={idx}
-              className="bg-[#312f4bff] lg:p-3 p-2 text-center rounded-lg flex flex-col items-center space-y-3 hover:scale-105 hover:bg-[#3d3b58] transition-transform duration-200"
+              // REMOVED: min-w-[100px] as it's no longer needed. Adjusted spacing.
+              className="flex flex-col items-center space-y-2 rounded-lg bg-[#312f4bff] p-3 text-center text-white transition-transform duration-200 hover:scale-105 hover:bg-[#3d3b58]"
             >
-              <div className="h-4 w-12">
-                <h3 className="text-white">{day}</h3>
-              </div>
-              <div className="w-20 h-20">
-                <img
-                  src={`src/assets/icon-${icon}.webp`}
-                  alt={icon}
-                  className=""
-                />
-              </div>
-              <div className="flex items-center justify-between w-full text-white text-sm space-x-2">
-                <div className="h-4 w-10 text-start">
-                  <h3>
-                    {displayMaxTemp}
-                    {tempUnit}
-                  </h3>
-                </div>
-                <div className="h-4 w-10 text-end">
-                  <h3>
-                    {displayMinTemp}
-                    {tempUnit}
-                  </h3>
-                </div>
+              {/* REMOVED: Fixed h-4 wrapper div. Let the h3 define its own height. */}
+              <h3 className="font-medium">{day}</h3>
+
+              {/* REMOVED: Fixed w-20 h-20 wrapper. Sized the image directly. */}
+              <img
+                src={`src/assets/icon-${icon}.webp`}
+                alt={icon}
+                className="h-16 w-16 object-contain" // Sizing applied directly to the image
+              />
+
+              {/* REMOVED: Fixed h-4 wrappers. Let content define height. */}
+              <div className="flex w-full justify-between pt-1 text-sm">
+                <span className="font-semibold">
+                  {displayMaxTemp}
+                  {tempUnit}
+                </span>
+                <span className="text-gray-400">
+                  {displayMinTemp}
+                  {tempUnit}
+                </span>
               </div>
             </div>
           );

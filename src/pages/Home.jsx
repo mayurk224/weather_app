@@ -83,44 +83,70 @@ const Home = () => {
   const loading = !weatherData && !apiError; // Adjust loading state
   return (
     <div>
-      <div className="lg:px-20 lg:py-6 p-4">
-        <div className="flex items-center justify-between">
-          <div className="logo">
-            <img src="src/assets/logo.svg" alt="" className="h-9 lg:h-10 " />
-          </div>
-          <div className="">
-            <UnitsCombobox units={units} onUnitsChange={handleUnitsChange} />
-          </div>
-        </div>
-        {apiError ? (
-          <ApiError />
-        ) : (
-          <>
-            <Search onWeatherData={handleWeatherData} />
-            <div className="lg:mt-10 mt-8 lg:flex lg:space-x-5 lg:h-screen">
-              <div className="leftBlock">
-                <HeroBlock
-                  city={city.name}
-                  country={city.country}
-                  apparent_temperature={apparent_temperature}
-                  precipitation={precipitation}
-                  relative_humidity_2m={relative_humidity_2m}
-                  wind_speed_10m={wind_speed_10m}
-                  weather_code={weather_code}
-                  temperature_2m={temperature_2m}
-                  time={time}
-                  loading={loading}
-                  units={units} // Pass units to HeroBlock
-                  onWeatherData={handleWeatherData} // Pass weather data handler
-                />
-                <DailyForecast data={daily} loading={loading} units={units} />{" "}
-                {/* Pass units to DailyForecast */}
-              </div>
-              <HourlyForecast data={hourly} loading={loading} units={units} />{" "}
-              {/* Pass units to HourlyForecast */}
+      {/* Added a container to center and constrain the max-width on large screens */}
+      <div className="mx-auto max-w-7xl lg:px-8">
+        <div className="lg:py-6 p-4">
+          <div className="flex items-center justify-between">
+            <div className="logo">
+              <img
+                src="src/assets/logo.svg"
+                alt="Logo"
+                className="h-9 lg:h-10"
+              />
             </div>
-          </>
-        )}
+            <div className="">
+              <UnitsCombobox units={units} onUnitsChange={handleUnitsChange} />
+            </div>
+          </div>
+          {apiError ? (
+            <ApiError />
+          ) : (
+            <>
+              <Search onWeatherData={handleWeatherData} />
+              {/* This container now controls the two-column layout on desktop */}
+              <div className="lg:mt-10 mt-8 lg:flex lg:space-x-8">
+                {/* - Added lg:w-2/3 to set its width to 2/3 of the container on large screens.
+              - Added mb-8 and lg:mb-0 to create vertical space on mobile but not on desktop.
+            */}
+                <div className="lg:w-2/3 mb-8 lg:mb-0">
+                  <HeroBlock
+                    city={city.name}
+                    country={city.country}
+                    apparent_temperature={apparent_temperature}
+                    precipitation={precipitation}
+                    relative_humidity_2m={relative_humidity_2m}
+                    wind_speed_10m={wind_speed_10m}
+                    weather_code={weather_code}
+                    temperature_2m={temperature_2m}
+                    time={time}
+                    loading={loading}
+                    units={units}
+                    onWeatherData={handleWeatherData}
+                  />
+                  {/* Added a margin-top to space it from the HeroBlock above it */}
+                  <div className="mt-8">
+                    <DailyForecast
+                      data={daily}
+                      loading={loading}
+                      units={units}
+                    />
+                  </div>
+                </div>
+
+                {/* - Added lg:w-1/3 to set its width to 1/3 of the container on large screens.
+              - This ensures the layout is a predictable 2/3 + 1/3 split.
+            */}
+                <div className="lg:w-1/3">
+                  <HourlyForecast
+                    data={hourly}
+                    loading={loading}
+                    units={units}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
