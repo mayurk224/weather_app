@@ -21,7 +21,10 @@ const ApiError = () => {
           </p>
         </div>
         <div className="">
-          <button className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+          <button
+            className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            onClick={() => window.location.reload()}
+          >
             <RefreshCcw className="w-4 h-4 mr-2" />
             Retry
           </button>

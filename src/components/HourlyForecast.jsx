@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { convertTemperature, getTemperatureUnit } from "../utils/units";
 
 // Weather code to icon mapping
 const weatherIcons = {
@@ -14,7 +15,7 @@ const weatherIcons = {
   95: "src/assets/icon-storm.webp",
 };
 
-export default function HourlyForecast({ data, loading }) {
+export default function HourlyForecast({ data, loading, units }) {
   const [groupedData, setGroupedData] = useState({});
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
@@ -45,8 +46,11 @@ export default function HourlyForecast({ data, loading }) {
         time: date.toLocaleTimeString("en-US", {
           hour: "numeric",
           hour12: true,
+          timeZone: "UTC",
         }),
-        temp: Math.round(data.temperature_2m[idx]),
+        temp: Math.round(
+          convertTemperature(data.temperature_2m[idx], units.temperature)
+        ),
         icon: weatherIcons[data.weather_code[idx]] || weatherIcons[0],
       });
     });
@@ -54,7 +58,7 @@ export default function HourlyForecast({ data, loading }) {
     setGroupedData(grouped);
     setDays(dayLabels);
     if (dayLabels.length > 0) setSelectedDay(dayLabels[0]);
-  }, [data]);
+  }, [data, units.temperature]); // Add units.temperature to dependency array
 
   const handleSelect = (dayKey) => {
     setSelectedDay(dayKey);
@@ -71,6 +75,8 @@ export default function HourlyForecast({ data, loading }) {
       <div className="w-8 h-5 bg-gray-700 rounded"></div>
     </div>
   );
+
+  const tempUnit = getTemperatureUnit(units.temperature);
 
   return (
     <div className="mt-10 lg:mt-0 bg-[#272541ff] rounded-lg lg:w-1/3 w-full">
@@ -126,7 +132,8 @@ export default function HourlyForecast({ data, loading }) {
                   </span>
                 </div>
                 <span className="text-white text-md font-semibold">
-                  {hour.temp}°
+                  {hour.temp}
+                  {tempUnit}
                 </span>
               </div>
             ))}

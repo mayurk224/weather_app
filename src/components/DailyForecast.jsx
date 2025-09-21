@@ -1,4 +1,5 @@
 import React from "react";
+import { convertTemperature, getTemperatureUnit } from "../utils/units";
 
 // Map weather code to icon name
 const getIconName = (code) => {
@@ -13,7 +14,7 @@ const getIconName = (code) => {
   return "overcast";
 };
 
-const DailyForecast = ({ data, loading }) => {
+const DailyForecast = ({ data, loading, units }) => {
   // Skeleton component
   const SkeletonCard = () => (
     <div className="bg-[#272541ff] lg:p-3 p-2 rounded-lg flex flex-col items-center space-y-3 animate-pulse">
@@ -45,6 +46,8 @@ const DailyForecast = ({ data, loading }) => {
     return null; // Or show "No data available"
   }
 
+  const tempUnit = getTemperatureUnit(units.temperature);
+
   return (
     <div className="mt-10 space-y-5">
       <h1 className="text-white text-2xl font-bold">Daily Forecast</h1>
@@ -54,14 +57,24 @@ const DailyForecast = ({ data, loading }) => {
         {data.time.map((dateStr, idx) => {
           const dateObj = new Date(dateStr);
           const day = dateObj.toLocaleDateString("en-US", { weekday: "short" });
-          const min = data.temperature_2m_min?.[idx] ?? "-";
-          const max = data.temperature_2m_max?.[idx] ?? "-";
+          const minCelsius = data.temperature_2m_min?.[idx] ?? "-";
+          const maxCelsius = data.temperature_2m_max?.[idx] ?? "-";
           const code = data.weather_code?.[idx];
           const icon = getIconName(Number(code));
+
+          const displayMinTemp =
+            minCelsius !== "-"
+              ? Math.round(convertTemperature(minCelsius, units.temperature))
+              : "-";
+          const displayMaxTemp =
+            maxCelsius !== "-"
+              ? Math.round(convertTemperature(maxCelsius, units.temperature))
+              : "-";
+
           return (
             <div
               key={idx}
-              className="bg-[#312f4b] lg:p-3 p-2 text-center rounded-lg flex flex-col items-center space-y-3 hover:scale-105 hover:bg-[#3d3b58] transition-transform duration-200"
+              className="bg-[#312f4bff] lg:p-3 p-2 text-center rounded-lg flex flex-col items-center space-y-3 hover:scale-105 hover:bg-[#3d3b58] transition-transform duration-200"
             >
               <div className="h-4 w-12">
                 <h3 className="text-white">{day}</h3>
@@ -75,10 +88,16 @@ const DailyForecast = ({ data, loading }) => {
               </div>
               <div className="flex items-center justify-between w-full text-white text-sm space-x-2">
                 <div className="h-4 w-10 text-start">
-                  <h3>{max}&#176;C</h3>
+                  <h3>
+                    {displayMaxTemp}
+                    {tempUnit}
+                  </h3>
                 </div>
                 <div className="h-4 w-10 text-end">
-                  <h3>{min}&#176;C</h3>
+                  <h3>
+                    {displayMinTemp}
+                    {tempUnit}
+                  </h3>
                 </div>
               </div>
             </div>

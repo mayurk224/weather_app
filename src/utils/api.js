@@ -39,7 +39,7 @@ export const getWeatherData = async (latitude, longitude) => {
     return await response.json();
   } catch (error) {
     console.error("Weather API Error:", error);
-    return null;
+    return { error: true };
   }
 };
 
