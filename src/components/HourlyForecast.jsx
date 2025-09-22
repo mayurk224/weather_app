@@ -120,7 +120,7 @@ export default function HourlyForecast({ data, loading, units }) {
       </div>
 
       {/* Improved: Adaptive Height Container */}
-      <div className="hourlyContainer space-y-2 overflow-y-auto h-[560px] rounded-b-lg pr-4 pl-5 py-5">
+      <div className="hourlyContainer space-y-2 overflow-y-auto h-[560px] rounded-b-lg sm:pr-4 sm:pl-5 sm:py-5 p-5">
         {loading
           ? Array(6)
               .fill(0)

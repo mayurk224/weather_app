@@ -8,7 +8,116 @@ const Search = ({ onWeatherData }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  
+  // Voice search states
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
+  
   const suggestionRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    // Check browser support with prefixed properties
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+    
+    if (SpeechRecognition) {
+      setVoiceSupported(true);
+      
+      // Create recognition instance
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+
+      // Configure recognition settings
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      // Optional: Set up grammar for better city recognition
+      if (SpeechGrammarList) {
+        const speechRecognitionList = new SpeechGrammarList();
+        // Simple grammar for city names (you can expand this)
+        const grammar = '#JSGF V1.0; grammar cities; public <city> = <city_name>;';
+        speechRecognitionList.addFromString(grammar, 1);
+        recognition.grammars = speechRecognitionList;
+      }
+
+      // Event handlers
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceError("");
+        console.log("Voice recognition started");
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const confidence = event.results[0][0].confidence;
+        
+        console.log(`Voice input received: ${transcript} (confidence: ${confidence})`);
+        setQuery(transcript);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+        
+        let errorMessage = "";
+        switch (event.error) {
+          case 'no-speech':
+            errorMessage = "No speech was detected. Please try again.";
+            break;
+          case 'audio-capture':
+            errorMessage = "Microphone not accessible. Please check permissions.";
+            break;
+          case 'not-allowed':
+            errorMessage = "Microphone access denied. Please allow microphone access.";
+            break;
+          case 'network':
+            errorMessage = "Network error occurred during voice recognition.";
+            break;
+          case 'language-not-supported':
+            errorMessage = "Language not supported for voice recognition.";
+            break;
+          default:
+            errorMessage = "An error occurred during voice recognition.";
+        }
+        setVoiceError(errorMessage);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        console.log("Voice recognition ended");
+      };
+
+      recognition.onnomatch = () => {
+        setVoiceError("No match found. Please speak more clearly.");
+        setIsListening(false);
+      };
+
+      recognition.onspeechstart = () => {
+        console.log("Speech detected");
+      };
+
+      recognition.onspeechend = () => {
+        console.log("Speech ended");
+      };
+
+    } else {
+      console.warn("Speech Recognition not supported in this browser");
+      setVoiceSupported(false);
+    }
+
+    // Cleanup
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
 
   // Load favorites from localStorage on component mount
   useEffect(() => {
@@ -47,6 +156,32 @@ const Search = ({ onWeatherData }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Voice search functions
+  const startVoiceSearch = () => {
+    if (!voiceSupported) {
+      alert('Voice search is not supported in your browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+
+    if (!recognitionRef.current) {
+      setVoiceError("Voice recognition not initialized.");
+      return;
+    }
+
+    try {
+      recognitionRef.current.start();
+    } catch (error) {
+      console.error("Error starting voice recognition:", error);
+      setVoiceError("Failed to start voice recognition. Please try again.");
+    }
+  };
+
+  const stopVoiceSearch = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+    }
+  };
 
   // Handle selecting a city
   const handleSelectCity = async (city) => {
@@ -88,7 +223,6 @@ const Search = ({ onWeatherData }) => {
         const { latitude, longitude } = position.coords;
 
         try {
-          // Get city and country name from coordinates
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
           );
@@ -106,12 +240,10 @@ const Search = ({ onWeatherData }) => {
             id: `${latitude}-${longitude}`,
           };
 
-          // Update search query
           setQuery(`${city.name}, ${city.country}`);
           setResults([]);
           setShowSuggestions(false);
 
-          // Save to localStorage
           localStorage.setItem(
             "lastCity",
             JSON.stringify({
@@ -122,7 +254,6 @@ const Search = ({ onWeatherData }) => {
             })
           );
 
-          // Get weather data
           const weather = await getWeatherData(latitude, longitude);
 
           if (onWeatherData) {
@@ -178,12 +309,10 @@ const Search = ({ onWeatherData }) => {
 
     let updatedFavorites;
     if (isFavorite) {
-      // Remove from favorites
       updatedFavorites = savedFavorites.filter(
         (fav) => `${fav.name}-${fav.country}` !== cityKey
       );
     } else {
-      // Add to favorites
       const favoriteCity = {
         name: city.name,
         country: city.country,
@@ -212,14 +341,21 @@ const Search = ({ onWeatherData }) => {
         </h1>
       </div>
 
+      {/* Voice Error Message */}
+      {voiceError && (
+        <div className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm max-w-xl">
+          {voiceError}
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0 items-start justify-center h-full w-full max-w-xl">
         <div className="relative w-full lg:w-2xl" ref={suggestionRef}>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full py-3 pl-14 pr-12 rounded-lg outline-none text-white border bg-[#272541ff] hover:bg-[#302e4b]"
-            placeholder="Search for a city ..."
+            className="w-full py-3 pl-14 pr-24 rounded-lg outline-none text-white border bg-[#272541ff] hover:bg-[#302e4b]"
+            placeholder="Search for a city or click the mic..."
             onFocus={() => query.length >= 2 && setShowSuggestions(true)}
           />
 
@@ -228,6 +364,39 @@ const Search = ({ onWeatherData }) => {
             alt=""
             className="absolute left-5 top-1/2 transform -translate-y-1/2"
           />
+
+          {/* Voice Search Button - Only show if supported */}
+          {voiceSupported && (
+            <button
+              onClick={isListening ? stopVoiceSearch : startVoiceSearch}
+              disabled={isListening}
+              className={`absolute right-12 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-all duration-200 ${
+                isListening 
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse scale-110' 
+                  : 'hover:bg-[#302e4b] hover:scale-105'
+              }`}
+              title={isListening ? "Listening... Click to stop" : "Start voice search"}
+            >
+              <svg
+                className={`w-5 h-5 transition-colors ${
+                  isListening ? 'text-white' : 'text-white hover:text-white'
+                }`}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isListening ? (
+                  // Stop icon when listening
+                  <rect x="6" y="6" width="12" height="12" rx="1"/>
+                ) : (
+                  // Microphone icon when not listening
+                  <>
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                  </>
+                )}
+              </svg>
+            </button>
+          )}
 
           {/* Current Location Button */}
           <button
@@ -278,6 +447,16 @@ const Search = ({ onWeatherData }) => {
               </svg>
             )}
           </button>
+
+          {/* Voice Status Indicator */}
+          {isListening && (
+            <div className="absolute -bottom-10 left-0 right-0 text-center">
+              <div className="inline-flex items-center space-x-2 text-sm text-blue-400 bg-[#272541ff] px-4 py-2 rounded-full border border-blue-400/30">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <span>Listening for city name...</span>
+              </div>
+            </div>
+          )}
 
           {showSuggestions && (
             <div className="suggestionBlock absolute top-full left-0 mt-3 w-full text-left space-y-2 bg-[#272541ff] p-3 rounded-lg z-50">

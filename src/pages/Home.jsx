@@ -84,7 +84,7 @@ const Home = () => {
   return (
     <div>
       {/* Added a container to center and constrain the max-width on large screens */}
-      <div className="mx-auto max-w-7xl lg:px-8">
+      <div className="mx-auto max-w-[1440px] lg:px-8">
         <div className="lg:py-6 p-4">
           <div className="flex items-center justify-between">
             <div className="logo">
