@@ -86,15 +86,15 @@ const Home = () => {
       {/* Added a container to center and constrain the max-width on large screens */}
       <div className="mx-auto max-w-[1440px] lg:px-8">
         <div className="lg:py-6 p-4">
-          <div className="flex items-center justify-between">
-            <div className="logo">
+          <div className="flex items-center justify-between gap-4">
+            <div className="logo flex-shrink-0">
               <img
                 src="src/assets/logo.svg"
                 alt="Logo"
-                className="h-9 lg:h-10"
+                className="h-9 sm:h-10 icon-auto" // Use w-auto instead of a custom class
               />
             </div>
-            <div className="">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <UnitsCombobox units={units} onUnitsChange={handleUnitsChange} />
             </div>
           </div>

@@ -336,7 +336,7 @@ const Search = ({ onWeatherData }) => {
   return (
     <div className="flex flex-col items-center justify-center text-center mt-10 lg:mt-14 space-y-8 w-full">
       <div>
-        <h1 className="bricolage-grotesque text-white text-4xl font-bold lg:text-5xl">
+        <h1 className="bricolage-grotesque text-primary text-4xl font-bold lg:text-5xl">
           How's the Sky looking today?
         </h1>
       </div>
@@ -354,7 +354,7 @@ const Search = ({ onWeatherData }) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full py-3 pl-14 pr-24 rounded-lg outline-none text-white border bg-[#272541ff] hover:bg-[#302e4b]"
+            className="w-full py-3 pl-14 pr-24 rounded-lg outline-none text-primary border border-theme bg-card hover:bg-card-hover transition-colors"
             placeholder="Search for a city or click the mic..."
             onFocus={() => query.length >= 2 && setShowSuggestions(true)}
           />
@@ -373,13 +373,13 @@ const Search = ({ onWeatherData }) => {
               className={`absolute right-12 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-all duration-200 ${
                 isListening 
                   ? 'bg-red-500 hover:bg-red-600 animate-pulse scale-110' 
-                  : 'hover:bg-[#302e4b] hover:scale-105'
+                  : 'hover:bg-card-hover hover:scale-105'
               }`}
               title={isListening ? "Listening... Click to stop" : "Start voice search"}
             >
               <svg
                 className={`w-5 h-5 transition-colors ${
-                  isListening ? 'text-white' : 'text-white hover:text-white'
+                  isListening ? 'text-white' : 'text-primary hover:text-primary'
                 }`}
                 fill="currentColor"
                 viewBox="0 0 24 24"
@@ -402,12 +402,12 @@ const Search = ({ onWeatherData }) => {
           <button
             onClick={handleCurrentLocation}
             disabled={locationLoading}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-[#302e4b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-card-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Use current location"
           >
             {locationLoading ? (
               <svg
-                className="w-5 h-5 text-white animate-spin"
+                className="w-5 h-5 text-primary animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -427,7 +427,7 @@ const Search = ({ onWeatherData }) => {
               </svg>
             ) : (
               <svg
-                className="w-5 h-5 text-white"
+                className="w-5 h-5 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -451,7 +451,7 @@ const Search = ({ onWeatherData }) => {
           {/* Voice Status Indicator */}
           {isListening && (
             <div className="absolute -bottom-10 left-0 right-0 text-center">
-              <div className="inline-flex items-center space-x-2 text-sm text-blue-400 bg-[#272541ff] px-4 py-2 rounded-full border border-blue-400/30">
+              <div className="inline-flex items-center space-x-2 text-sm text-accent bg-card px-4 py-2 rounded-full border border-theme">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                 <span>Listening for city name...</span>
               </div>
@@ -459,9 +459,9 @@ const Search = ({ onWeatherData }) => {
           )}
 
           {showSuggestions && (
-            <div className="suggestionBlock absolute top-full left-0 mt-3 w-full text-left space-y-2 bg-[#272541ff] p-3 rounded-lg z-50">
+            <div className="suggestionBlock absolute top-full left-0 mt-3 w-full text-left space-y-2 bg-card p-3 rounded-lg z-50 border border-theme">
               {loading && (
-                <div className="searchProgress flex items-center space-x-2 text-gray-400 p-1">
+                <div className="searchProgress flex items-center space-x-2 text-secondary p-1">
                   <img
                     src="/src/assets/icon-loading.svg"
                     alt=""
@@ -473,18 +473,18 @@ const Search = ({ onWeatherData }) => {
 
               {!loading && query.length >= 2 && results.length === 0 && (
                 <div className="noResult p-1">
-                  <h3 className="text-gray-400 text-center">
+                  <h3 className="text-secondary text-center">
                     No search results found !
                   </h3>
                 </div>
               )}
 
               {!loading && results.length > 0 && (
-                <div className="bg-[#272541ff] text-white rounded-md mt-1 overflow-hidden">
+                <div className="bg-card text-primary rounded-md mt-1 overflow-hidden">
                   {results.map((city) => (
                     <div
                       key={city.id}
-                      className="flex items-center justify-between p-2 hover:bg-[#302e4b] group"
+                      className="flex items-center justify-between p-2 hover:bg-card-hover group"
                     >
                       <div
                         className="flex-1 cursor-pointer"
@@ -498,7 +498,7 @@ const Search = ({ onWeatherData }) => {
                           e.stopPropagation();
                           toggleFavorite(city);
                         }}
-                        className="ml-2 p-1 rounded-md hover:bg-[#4455daff] transition-colors"
+                        className="ml-2 p-1 rounded-md hover:bg-button transition-colors"
                         title={
                           isCityFavorite(city)
                             ? "Remove from favorites"
@@ -507,14 +507,14 @@ const Search = ({ onWeatherData }) => {
                       >
                         {isCityFavorite(city) ? (
                           <svg
-                            className="w-4 h-4 text-yellow-400 fill-current"
+                            className="w-4 h-4 text-accent fill-current"
                             viewBox="0 0 24 24"
                           >
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                           </svg>
                         ) : (
                           <svg
-                            className="w-4 h-4 text-gray-400 hover:text-yellow-400"
+                            className="w-4 h-4 text-secondary hover:text-accent"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -538,7 +538,7 @@ const Search = ({ onWeatherData }) => {
 
         {/* Search button fallback */}
         <button
-          className="bg-[#4455daff] hover:bg-[#2d1c9cff] text-white rounded-lg px-4 py-3 w-full lg:w-auto lg:min-w-[120px]"
+          className="bg-button hover:bg-button-hover text-white rounded-lg px-4 py-3 w-full lg:w-auto lg:min-w-[120px] transition-colors"
           onClick={async () => {
             if (results.length > 0) {
               await handleSelectCity(results[0]);

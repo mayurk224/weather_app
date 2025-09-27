@@ -69,28 +69,31 @@ export default function HourlyForecast({ data, loading, units }) {
   };
 
   const SkeletonCard = () => (
-    <div className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#312f4bff] px-4 py-3 animate-pulse">
+    <div className="flex items-center justify-between rounded-lg border border-theme bg-card px-4 py-3 animate-pulse">
       <div className="flex items-center space-x-3">
-        <div className="h-10 w-10 rounded-full bg-gray-700"></div>
-        <div className="h-5 w-16 rounded bg-gray-700"></div>
+        <div className="h-10 w-10 rounded-full" style={{backgroundColor: 'var(--border-color)'}}></div>
+        <div className="h-5 w-16 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
       </div>
-      <div className="h-5 w-8 rounded bg-gray-700"></div>
+      <div className="h-5 w-8 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
     </div>
   );
 
   const tempUnit = getTemperatureUnit(units.temperature);
 
   return (
-    <div className="mt-10 w-full rounded-lg bg-[#272541ff] h-[650px] lg:mt-0">
+    <div className="mt-10 w-full rounded-lg bg-card h-[650px] lg:mt-0">
       {/* Header with Title and Dropdown */}
       <div className="flex items-center justify-between p-5">
-        <h2 className="text-lg font-medium text-white">Hourly forecast</h2>
+        <h2 className="text-lg font-medium text-primary">Hourly forecast</h2>
 
         {/* Original Dropdown Selector */}
         <div className="relative inline-block text-left">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center rounded-lg border border-gray-600 bg-[#312f4bff] px-3 py-2 text-white transition-colors hover:bg-[#3d3b5eff]"
+            className="flex items-center rounded-lg border border-theme bg-card-hover px-3 py-2 text-primary transition-colors hover:bg-card-hover"
+            style={{'--hover-bg': 'var(--card-hover-color)'}}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
           >
             <span className="text-sm font-medium">
               {groupedData[selectedDay]?.label || "Loading..."}
@@ -98,18 +101,18 @@ export default function HourlyForecast({ data, loading, units }) {
             <img
               src="src/assets/icon-dropdown.svg"
               alt="Dropdown"
-              className={`ml-1 h-4 w-4 text-gray-300 transition-transform ${
+              className={`icon-auto ml-1 h-4 w-4 text-secondary transition-transform ${
                 isOpen ? "rotate-180" : ""
               }`}
             />
           </button>
           {isOpen && (
-            <ul className="absolute right-0 z-10 mt-1 w-40 rounded-lg border border-gray-600 bg-[#312f4bff] shadow-lg">
+            <ul className="absolute right-0 z-10 mt-1 w-40 rounded-lg border border-theme bg-card shadow-lg">
               {days.map((dayKey) => (
                 <li
                   key={dayKey}
                   onClick={() => handleSelect(dayKey)}
-                  className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-[#3d3b5eff]"
+                  className="cursor-pointer px-3 py-2 text-sm text-primary hover:bg-card-hover"
                 >
                   {groupedData[dayKey].label}
                 </li>
@@ -128,7 +131,10 @@ export default function HourlyForecast({ data, loading, units }) {
           : groupedData[selectedDay]?.hours.map((hour, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between rounded-lg border border-gray-600 bg-[#312f4bff] px-4 py-3 transition-colors hover:bg-[#3d3b5eff]"
+                className="flex items-center justify-between rounded-lg border border-theme bg-card-hover px-4 py-3 transition-colors hover:bg-card-hover"
+                style={{'--hover-bg': 'var(--card-hover-color)'}}
+                onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
               >
                 <div className="flex items-center space-x-3">
                   <img
@@ -136,11 +142,11 @@ export default function HourlyForecast({ data, loading, units }) {
                     alt="weather icon"
                     className="h-10 w-10"
                   />
-                  <span className="text-lg font-medium text-white">
+                  <span className="text-lg font-medium text-primary">
                     {hour.time}
                   </span>
                 </div>
-                <span className="text-md font-semibold text-white">
+                <span className="text-md font-semibold text-primary">
                   {hour.temp}
                   {tempUnit}
                 </span>

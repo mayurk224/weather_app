@@ -8,21 +8,21 @@ const ApiError = () => {
           <img
             src="src/assets/icon-error.svg"
             alt=""
-            className="w-10 h-10 mx-auto"
+            className="w-10 h-10 mx-auto icon-auto"
           />
         </div>
         <div className="">
-          <h1 className="text-4xl font-semibold text-white">
+          <h1 className="text-4xl font-semibold text-primary">
             Something went wrong
           </h1>
-          <p className="text-gray-400 mt-2 lg:w-md">
+          <p className="text-secondary mt-2 lg:w-md">
             We couldn't connect to server(API error). Please try again in a few
             moments
           </p>
         </div>
         <div className="">
           <button
-            className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="flex items-center bg-button hover:bg-button-hover text-primary px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             onClick={() => window.location.reload()}
           >
             <RefreshCcw className="w-4 h-4 mr-2" />

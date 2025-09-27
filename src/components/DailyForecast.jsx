@@ -17,15 +17,15 @@ const getIconName = (code) => {
 const DailyForecast = ({ data, loading, units }) => {
   // Skeleton component - Updated to be flexible
   const SkeletonCard = () => (
-    <div className="flex animate-pulse flex-col items-center space-y-2 rounded-lg bg-[#272541ff] p-3">
+    <div className="flex animate-pulse flex-col items-center space-y-2 rounded-lg bg-card p-3">
       {/* REMOVED: Fixed h-4, w-12. Let the skeleton mimic the text size. */}
-      <div className="h-5 w-14 rounded bg-gray-700"></div>
+      <div className="h-5 w-14 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
       {/* REMOVED: Wrapper div. Size the image skeleton directly. */}
-      <div className="h-16 w-16 rounded-full bg-gray-700"></div>
+      <div className="h-16 w-16 rounded-full" style={{backgroundColor: 'var(--border-color)'}}></div>
       <div className="flex w-full justify-between pt-1">
         {/* REMOVED: Fixed h-4, w-10. */}
-        <div className="h-5 w-10 rounded bg-gray-700"></div>
-        <div className="h-5 w-10 rounded bg-gray-700"></div>
+        <div className="h-5 w-10 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
+        <div className="h-5 w-10 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
       </div>
     </div>
   );
@@ -37,7 +37,7 @@ const DailyForecast = ({ data, loading, units }) => {
   if (loading) {
     return (
       <div className="mt-10 space-y-5">
-        <h1 className="text-2xl font-bold text-white">Daily Forecast</h1>
+        <h1 className="text-2xl font-bold text-primary">Daily Forecast</h1>
         {/* CHANGED: Grid classes now match the data grid to prevent layout shift */}
         <div className={gridClasses}>
           {Array.from({ length: 7 }).map((_, idx) => (
@@ -56,7 +56,7 @@ const DailyForecast = ({ data, loading, units }) => {
 
   return (
     <div className="mt-10 space-y-5">
-      <h1 className="text-2xl font-bold text-white">Daily Forecast</h1>
+      <h1 className="text-2xl font-bold text-primary">Daily Forecast</h1>
 
       <div className={gridClasses}>
         {data.time.map((dateStr, idx) => {
@@ -80,7 +80,10 @@ const DailyForecast = ({ data, loading, units }) => {
             <div
               key={idx}
               // REMOVED: min-w-[100px] as it's no longer needed. Adjusted spacing.
-              className="flex flex-col items-center space-y-2 rounded-lg bg-[#312f4bff] p-3 text-center text-white transition-transform duration-200 hover:scale-105 hover:bg-[#3d3b58]"
+              className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary transition-all duration-200 hover:scale-105 hover:bg-card-hover border border-theme"
+              style={{'--hover-bg': 'var(--card-hover-color)'}}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
             >
               {/* REMOVED: Fixed h-4 wrapper div. Let the h3 define its own height. */}
               <h3 className="font-medium">{day}</h3>
@@ -98,7 +101,7 @@ const DailyForecast = ({ data, loading, units }) => {
                   {displayMaxTemp}
                   {tempUnit}
                 </span>
-                <span className="text-gray-400">
+                <span className="text-secondary">
                   {displayMinTemp}
                   {tempUnit}
                 </span>

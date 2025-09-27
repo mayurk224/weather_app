@@ -161,7 +161,7 @@ const HeroBlock = ({
     h-64 sm:h-72 
     flex flex-col justify-center items-center gap-4 
     sm:flex-row sm:justify-between sm:px-20 lg:items-center lg:p-10 p-5 
-    ${loading ? "bg-[#272541ff] animate-pulse" : ""}`}
+    ${loading ? "bg-card animate-pulse" : ""}`}
         style={
           !loading
             ? {
@@ -178,9 +178,9 @@ const HeroBlock = ({
             <img
               src="src/assets/icon-loading.svg"
               alt="Loading..."
-              className="h-8 w-8 animate-spin"
+              className="h-8 w-8 animate-spin icon-auto"
             />
-            <span className="text-white">Loading...</span>
+            <span className="text-primary">Loading...</span>
           </div>
         ) : (
           <>
@@ -198,13 +198,13 @@ const HeroBlock = ({
 
                 <button
                   onClick={handleToggleDropdown}
-                  className="text-white hover:text-yellow-400 transition-colors p-2 h-8 flex items-center justify-center w-8 rounded-full hover:bg-white/10 absolute -right-8"
+                  className=" hover:text-accent transition-colors p-2 h-8 flex items-center justify-center w-8 rounded-full hover:bg-white/10 absolute -right-8"
                   title="View favorite cities"
                 >
                   <img
                     src="src/assets/icon-dropdown.svg"
                     alt=""
-                    className={`${
+                    className={` ${
                       showFavorites
                         ? "rotate-180 transition-all ease-in-out"
                         : "transition-all ease-in-out"
@@ -215,25 +215,25 @@ const HeroBlock = ({
                 {showFavorites && (
                   <div
                     className="showFavoriteList absolute top-14 sm:left-3/4 left-1/2 -translate-x-1/2 
-  mt-2 bg-[#272541ff] rounded-lg shadow-lg z-50 
+  mt-2 bg-card rounded-lg shadow-lg z-50 
   min-w-[250px] max-h-60 overflow-y-auto"
                   >
                     {favorites.length === 0 ? (
-                      <div className="p-3 text-gray-400 text-center">
+                      <div className="p-3 text-secondary text-center">
                         No favorite cities yet
                       </div>
                     ) : (
                       <div className="p-2">
-                        <div className="text-gray-300 text-sm font-medium p-2 border-b border-gray-600">
+                        <div className="text-primary text-sm font-medium p-2 border-b border-theme">
                           Favorite Cities
                         </div>
                         {favorites.map((fav) => (
                           <div
                             key={`${fav.name}-${fav.country}`}
-                            className="flex items-center justify-between p-2 hover:bg-[#302e4b] rounded-md group"
+                            className="flex items-center justify-between p-2 hover:bg-card-hover rounded-md group"
                           >
                             <div
-                              className="flex-1 cursor-pointer text-white"
+                              className="flex-1 cursor-pointer text-primary"
                               onClick={() => handleSelectFavorite(fav)}
                             >
                               {fav.name}, {fav.country}
@@ -247,7 +247,7 @@ const HeroBlock = ({
                               title="Remove from favorites"
                             >
                               <svg
-                                className="w-4 h-4 text-red-400"
+                                className="w-4 h-4 text-accent"
                                 fill="currentColor"
                                 viewBox="0 0 24 24"
                               >
@@ -261,7 +261,7 @@ const HeroBlock = ({
                   </div>
                 )}
               </div>
-              <h3 className="text-gray-300 cursor-default text-sm sm:text-base sm:text-start">
+              <h3 className="text-white cursor-default text-sm sm:text-base sm:text-start">
                 {formattedTime}
               </h3>
             </div>
@@ -271,7 +271,7 @@ const HeroBlock = ({
               <img
                 src={`src/assets/icon-${iconName}.webp`}
                 alt="Weather icon"
-                className="w-32 sm:w-32 lg:w-36"
+                className="w-32 sm:w-32 lg:w-36 icon-no-invert"
               />
               <h1 className="text-white text-6xl sm:text-6xl lg:text-7xl font-bold bricolage-grotesque italic cursor-default">
                 {displayTemperature}
@@ -298,15 +298,17 @@ const HeroBlock = ({
         ].map((item, idx) => (
           <div
             key={idx}
-            className={`bg-[#312f4bff] rounded-lg p-5 space-y-2 flex flex-col ${
-              loading ? "animate-pulse bg-[#272541ff]" : ""
+            className={`bg-card-hover rounded-lg p-5 space-y-2 flex flex-col ${
+              loading ? "animate-pulse bg-card" : ""
             }`}
           >
-            <h3 className="text-gray-300 text-sm">{item.label}</h3>
+            <h3 className="text-secondary text-sm">{item.label}</h3>
             {loading ? (
-              <h1 className="text-white text-2xl font-medium">—</h1>
+              <h1 className="text-primary text-2xl font-medium">—</h1>
             ) : (
-              <h1 className="text-white text-2xl font-medium">{item.value}</h1>
+              <h1 className="text-primary text-2xl font-medium">
+                {item.value}
+              </h1>
             )}
           </div>
         ))}
