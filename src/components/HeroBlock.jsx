@@ -22,6 +22,10 @@ const HeroBlock = ({
   loading, // 🔹 new prop to control skeleton
   units, // 🔹 new prop for units
   onWeatherData, // 🔹 new prop to update weather data when selecting favorite
+  // New props for additional weather data
+  uv_index,
+  visibility,
+  pressure_msl,
 }) => {
   const [showFavorites, setShowFavorites] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -144,6 +148,10 @@ const HeroBlock = ({
     units.precipitation
   ).toFixed(1); // Keep one decimal for precipitation
 
+  // New conversions
+  const displayVisibility = (visibility / 1000).toFixed(1); // Convert meters to kilometers
+  const displayPressure = Math.round(pressure_msl); // Pressure in hPa
+
   const tempUnit = getTemperatureUnit(units.temperature);
   const windUnit = getWindSpeedUnit(units.windSpeed);
   const precipUnit = getPrecipitationUnit(units.precipitation);
@@ -198,7 +206,7 @@ const HeroBlock = ({
 
                 <button
                   onClick={handleToggleDropdown}
-                  className=" hover:text-accent transition-colors p-2 h-8 flex items-center justify-center w-8 rounded-full hover:bg-white/10 absolute -right-8"
+                  className=" hover:text-accent transition-colors p-2 h-8 flex items-center justify-center w-8 rounded-full hover:bg-white/10 absolute -right-9"
                   title="View favorite cities"
                 >
                   <img
@@ -283,7 +291,7 @@ const HeroBlock = ({
       </div>
 
       {/* Bottom Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-5">
         {[
           {
             label: "Feels like",
@@ -295,6 +303,9 @@ const HeroBlock = ({
             label: "Precipitation",
             value: `${displayPrecipitation} ${precipUnit}`,
           },
+          { label: "UV Index", value: uv_index },
+          { label: "Visibility", value: `${displayVisibility} km` },
+          { label: "Pressure", value: `${displayPressure} hPa` },
         ].map((item, idx) => (
           <div
             key={idx}

@@ -1,4 +1,53 @@
-# React + Vite
+# Weather App with Smart Caching
+
+This is a weather application optimized to efficiently serve 3,000-5,000 daily active users while staying within Open-Meteo's free tier limits (10,000 API calls/day).
+
+## Features
+
+- Real-time weather data
+- 7-day forecasts
+- Sunrise/sunset times
+- Location-based weather
+- Voice search capability
+- Favorite cities
+- Theme switching (light/dark mode)
+
+## Optimizations
+
+This application implements several caching and optimization strategies to minimize API usage:
+
+1. **In-Memory Caching**: Weather data is cached for 15 minutes, geocoding data for 24 hours
+2. **Request Queue Management**: Limits concurrent API requests to prevent rate limiting
+3. **Debouncing**: Reduces unnecessary API calls during user input
+4. **LocalStorage Persistence**: Stores user preferences and last searched city
+
+See [CACHING_STRATEGY.md](CACHING_STRATEGY.md) for detailed implementation information.
+
+## Tech Stack
+
+- React with Vite
+- Tailwind CSS for styling
+- Open-Meteo API for weather data
+- Nominatim OpenStreetMap API for reverse geocoding
+
+## Setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+
+## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

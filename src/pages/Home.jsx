@@ -5,15 +5,10 @@ import DailyForecast from "../components/DailyForecast";
 import HeroBlock from "../components/HeroBlock";
 import HourlyForecast from "../components/HourlyForecast";
 import Search from "../components/Search";
+import SunriseSunset from "../components/SunriseSunset";
 import UnitsCombobox from "../components/UnitsCombobox"; // Import UnitsCombobox
 
 const Home = () => {
-  const sampleData = {
-    Tuesday: [
-      { time: "3 PM", icon: "rain", temp: 20 },
-      { time: "4 PM", icon: "partly_cloudy", temp: 20 },
-    ],
-  };
   const [weatherData, setWeatherData] = useState(null);
   const [apiError, setApiError] = useState(false);
   const [units, setUnits] = useState(() => {
@@ -68,14 +63,17 @@ const Home = () => {
   const current = weatherData?.weather?.current || {};
   const hourly = weatherData?.weather?.hourly || {};
 
+  // Remove unused variables
   const {
-    temperature_2m_min = [0],
-    temperature_2m_max = [0],
     weather_code = [0],
     apparent_temperature = 0,
     precipitation = 0,
     relative_humidity_2m = 0,
     wind_speed_10m = 0,
+    // New fields
+    uv_index = 0,
+    visibility = 0,
+    pressure_msl = 0,
   } = current || {}; // Ensure current is not null/undefined before destructuring
   const temperature_2m = current?.temperature_2m || 0;
   const time = current?.time || "N/A";
@@ -122,6 +120,10 @@ const Home = () => {
                     loading={loading}
                     units={units}
                     onWeatherData={handleWeatherData}
+                    // New props
+                    uv_index={uv_index}
+                    visibility={visibility}
+                    pressure_msl={pressure_msl}
                   />
                   {/* Added a margin-top to space it from the HeroBlock above it */}
                   <div className="mt-8">
@@ -130,6 +132,9 @@ const Home = () => {
                       loading={loading}
                       units={units}
                     />
+                  </div>
+                  <div className="mt-8">
+                    <SunriseSunset data={daily} loading={loading} />
                   </div>
                 </div>
 
@@ -142,6 +147,7 @@ const Home = () => {
                     loading={loading}
                     units={units}
                   />
+                  {/* Add SunriseSunset component */}
                 </div>
               </div>
             </>

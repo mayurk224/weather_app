@@ -19,13 +19,25 @@ const DailyForecast = ({ data, loading, units }) => {
   const SkeletonCard = () => (
     <div className="flex animate-pulse flex-col items-center space-y-2 rounded-lg bg-card p-3">
       {/* REMOVED: Fixed h-4, w-12. Let the skeleton mimic the text size. */}
-      <div className="h-5 w-14 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
+      <div
+        className="h-5 w-14 rounded"
+        style={{ backgroundColor: "var(--border-color)" }}
+      ></div>
       {/* REMOVED: Wrapper div. Size the image skeleton directly. */}
-      <div className="h-16 w-16 rounded-full" style={{backgroundColor: 'var(--border-color)'}}></div>
+      <div
+        className="h-16 w-16 rounded-full"
+        style={{ backgroundColor: "var(--border-color)" }}
+      ></div>
       <div className="flex w-full justify-between pt-1">
         {/* REMOVED: Fixed h-4, w-10. */}
-        <div className="h-5 w-10 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
-        <div className="h-5 w-10 rounded" style={{backgroundColor: 'var(--border-color)'}}></div>
+        <div
+          className="h-5 w-10 rounded"
+          style={{ backgroundColor: "var(--border-color)" }}
+        ></div>
+        <div
+          className="h-5 w-10 rounded"
+          style={{ backgroundColor: "var(--border-color)" }}
+        ></div>
       </div>
     </div>
   );
@@ -81,9 +93,13 @@ const DailyForecast = ({ data, loading, units }) => {
               key={idx}
               // REMOVED: min-w-[100px] as it's no longer needed. Adjusted spacing.
               className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary transition-all duration-200 hover:scale-105 hover:bg-card-hover border border-theme"
-              style={{'--hover-bg': 'var(--card-hover-color)'}}
-              onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--card-hover-color)'}
+              style={{ "--hover-bg": "var(--card-hover-color)" }}
+              onMouseEnter={(e) =>
+                (e.target.style.backgroundColor = "var(--card-hover-color)")
+              }
+              onMouseLeave={(e) =>
+                (e.target.style.backgroundColor = "var(--card-hover-color)")
+              }
             >
               {/* REMOVED: Fixed h-4 wrapper div. Let the h3 define its own height. */}
               <h3 className="font-medium">{day}</h3>
