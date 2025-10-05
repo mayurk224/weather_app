@@ -11,12 +11,22 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "framer-motion": "^12.23.16",
     "lucide-react": "^0.543.0",
     "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-speech-recognition": "^4.0.1",
+<<<<<<< HEAD
     "tailwindcss": "^4.1.13"
+=======
+    "tailwindcss": "^4.1.13",
+    "workbox-core": "^7.3.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0",
+    "workbox-sw": "^7.3.0",
+    "workbox-webpack-plugin": "^7.3.0"
+>>>>>>> 378f2149d0c43b2d96e0ea9f150d62b4b661e526
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
