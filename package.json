@@ -17,12 +17,13 @@
     "rollup": "^4.50.1"
   },
   "optionalDependencies": {
+    "@rollup/rollup-darwin-x64": "^4.50.1",
     "@rollup/rollup-linux-x64-gnu": "^4.50.1",
-    "@rollup/rollup-win32-x64-msvc": "^4.50.1",
-    "@rollup/rollup-darwin-x64": "^4.50.1"
+    "@rollup/rollup-win32-x64-msvc": "^4.50.1"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "@vercel/analytics": "^1.5.0",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.543.0",
     "prop-types": "^15.8.1",
