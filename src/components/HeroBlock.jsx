@@ -8,6 +8,7 @@ import {
   getPrecipitationUnit,
 } from "../utils/units";
 import { getWeatherData } from "../utils/api";
+import { Sparkles, Thermometer } from "lucide-react";
 
 const HeroBlock = ({
   city,
@@ -160,6 +161,8 @@ const HeroBlock = ({
   const SkeletonBox = ({ className }) => (
     <div className={` animate-pulse ${className}`} />
   );
+
+  const [activeTab, setActiveTab] = useState("weather"); // Add this to your component
 
   return (
     <div>
