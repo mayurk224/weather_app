@@ -154,6 +154,23 @@ const Home = () => {
           )}
         </div>
       </div>
+      {/* Footer with creator's name */}
+      <footer className="text-center py-4 text-sm text-gray-500">
+        <div class="attribution">
+          Challenge by{" "}
+          <a href="https://www.frontendmentor.io/challenges/weather-app-K1FhddVm49">
+            Frontend Mentor
+          </a>
+          . Coded by{" "}
+          <a
+            href="https://www.linkedin.com/in/mayur-kamble-a51348286"
+            target="_blank"
+          >
+            Mayur Kamble
+          </a>
+          .
+        </div>
+      </footer>
     </div>
   );
 };
