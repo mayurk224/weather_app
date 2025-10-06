@@ -249,7 +249,7 @@ const SunriseSunset = ({ data, loading = false }) => {
 
   if (loading) {
     return (
-      <div className="bg-slate-800 rounded-3xl p-8 w-full animate-pulse h-[450px]"></div>
+      <div className="bg-card rounded-3xl p-8 w-full animate-pulse h-[450px]"></div>
     );
   }
 
