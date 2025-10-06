@@ -10,7 +10,16 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "vercel-build": "npm rebuild --platform=linux --arch=x64 && npm run build"
+  },
+  "resolutions": {
+    "rollup": "^4.50.1"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.50.1",
+    "@rollup/rollup-win32-x64-msvc": "^4.50.1",
+    "@rollup/rollup-darwin-x64": "^4.50.1"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
