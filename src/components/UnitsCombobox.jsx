@@ -1,5 +1,6 @@
-import { ChevronDown, Settings } from "lucide-react";
+import { Settings, ChevronDown, Sun, Moon, Check } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const UnitsCombobox = ({
   units = {
@@ -15,11 +16,12 @@ const UnitsCombobox = ({
 
   // Theme state management
   const [isDark, setIsDark] = useState(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      return savedTheme === "dark";
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) return savedTheme === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
     }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return false;
   });
 
   // Theme effect
@@ -33,249 +35,206 @@ const UnitsCombobox = ({
     }
   }, [isDark]);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
+  const toggleTheme = () => setIsDark(!isDark);
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleSystemToggle = () => {
     const newSystem = units.system === "metric" ? "imperial" : "metric";
-    const newUnits = {
+    onUnitsChange({
       system: newSystem,
       temperature: newSystem === "metric" ? "celsius" : "fahrenheit",
       windSpeed: newSystem === "metric" ? "kmh" : "mph",
       precipitation: newSystem === "metric" ? "mm" : "inches",
-    };
-    onUnitsChange(newUnits);
+    });
   };
 
   const handleUnitChange = (type, value) => {
-    const newUnits = { ...units, [type]: value };
-    onUnitsChange(newUnits);
+    onUnitsChange({ ...units, [type]: value });
   };
 
   const isSelected = (type, value) => units[type] === value;
 
+  // Animation variants for the dropdown menu
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      y: -10,
+      scale: 0.95,
+      transition: { duration: 0.2, ease: "easeOut" },
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.2, ease: "easeIn" },
+    },
+  };
+
+  // A reusable component for menu items to reduce repetition
+  const MenuItem = ({ label, value, type }) => (
+    <motion.button
+      onClick={() => handleUnitChange(type, value)}
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
+        isSelected(type, value)
+          ? "bg-card-hover hover:bg-button text-primary"
+          : "text-secondary hover:bg-card-hover"
+      }`}
+      role="menuitemradio"
+      aria-checked={isSelected(type, value)}
+      whileHover={{
+        backgroundColor: isSelected(type, value)
+          ? "var(--color-button)"
+          : "var(--color-card-hover-deeper)",
+      }} // Assuming CSS variables
+      whileTap={{ scale: 0.98 }}
+    >
+      <span>{label}</span>
+      <AnimatePresence>
+        {isSelected(type, value) && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+          >
+            <Check className="w-4 h-4 text-primary" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+
   return (
     <div className="relative inline-block" ref={dropdownRef}>
-      {/* Main Units Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center rounded-lg border border-theme bg-card-hover px-2 py-2 text-primary transition-colors hover:bg-card-hover gap-2"
+        className="flex items-center rounded-lg border border-theme bg-card-hover px-3 py-2 text-primary transition-colors hover:bg-button gap-2"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+        aria-label="Units and theme settings"
       >
-        <div className="flex items-center space-x-2">
-          <img src="src\assets\icon-units.svg" alt="" className="icon-auto" />
-          <span className="text-sm font-semibold">Units</span>
-        </div>
-        <img
-          src="src\assets\icon-dropdown.svg"
-          alt=""
-          className={`w-4 h-4 text-secondary transition-transform icon-auto ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
+        <Settings className="w-5 h-5" />
+        <span className="text-sm font-semibold">Units</span>
+        <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
+          <ChevronDown className="ml-1 h-4 w-4 text-secondary" />
+        </motion.div>
       </button>
 
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-64 bg-card border border-theme rounded-lg shadow-xl z-50 overflow-hidden">
-          {/* System Toggle and Theme Toggle */}
-          <div className="p-3 border-b border-theme">
-            <div className="flex gap-2">
-              <button
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            variants={dropdownVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="absolute top-full right-0 mt-2 w-64 origin-top-right bg-card border border-theme rounded-lg shadow-xl z-50 overflow-hidden"
+            role="menu"
+            aria-label="Units and theme settings menu"
+          >
+            {/* System and Theme Toggles */}
+            <div className="p-3 border-b border-theme flex gap-2">
+              <motion.button
                 onClick={handleSystemToggle}
+                whileTap={{ scale: 0.98 }}
                 className="flex-1 bg-card-hover hover:bg-button text-primary rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                aria-label={`Switch to ${
+                  units.system === "metric" ? "Imperial" : "Metric"
+                } units`}
               >
-                Switch to {units.system === "metric" ? "Imperial" : "Metric"}
-              </button>
-              <button
+                {`Switch to ${
+                  units.system === "metric" ? "Imperial" : "Metric"
+                }`}
+              </motion.button>
+              <motion.button
                 onClick={toggleTheme}
+                whileTap={{ scale: 0.98 }}
                 className="p-2 rounded-lg transition-colors bg-card-hover hover:bg-button border border-theme text-primary"
                 aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
               >
-                {isDark ? (
-                  // Sun Icon
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="icon-auto"
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={isDark ? "moon" : "sun"}
+                    initial={{ y: -20, opacity: 0, rotate: -90 }}
+                    animate={{ y: 0, opacity: 1, rotate: 0 }}
+                    exit={{ y: 20, opacity: 0, rotate: 90 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <circle cx="12" cy="12" r="5" />
-                    <path d="M12 1v2" />
-                    <path d="M12 21v2" />
-                    <path d="M4.22 4.22l1.42 1.42" />
-                    <path d="M18.36 18.36l1.42 1.42" />
-                    <path d="M1 12h2" />
-                    <path d="M21 12h2" />
-                    <path d="M4.22 19.78l1.42-1.42" />
-                    <path d="M18.36 5.64l1.42-1.42" />
-                  </svg>
-                ) : (
-                  // Moon Icon
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                  </svg>
-                )}
-              </button>
+                    {isDark ? (
+                      <Sun className="w-5 h-5" />
+                    ) : (
+                      <Moon className="w-5 h-5" />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </motion.button>
             </div>
-          </div>
 
-          {/* Temperature Section */}
-          <div className="p-3 border-b border-theme">
-            <h3 className="text-secondary text-xs font-medium uppercase tracking-wide mb-3">
-              Temperature
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleUnitChange("temperature", "celsius")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                  isSelected("temperature", "celsius")
-                    ? "bg-card-hover hover:bg-button text-primary"
-                    : "text-secondary hover:bg-card-hover"
-                }`}
-              >
-                <span>Celsius (°C)</span>
-                {isSelected("temperature", "celsius") && (
-                  <img
-                    src="src/assets/icon-checkmark.svg"
-                    alt=""
-                    className="w-4 h-4 icon-auto"
-                  />
-                )}
-              </button>
-              <button
-                onClick={() => handleUnitChange("temperature", "fahrenheit")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                  isSelected("temperature", "fahrenheit")
-                    ? "bg-card-hover hover:bg-button text-primary"
-                    : "text-secondary hover:bg-card-hover"
-                }`}
-              >
-                <span>Fahrenheit (°F)</span>
-                {isSelected("temperature", "fahrenheit") && (
-                  <img
-                    src="src/assets/icon-checkmark.svg"
-                    alt=""
-                    className="w-4 h-4 icon-auto"
-                  />
-                )}
-              </button>
+            {/* Unit Sections */}
+            <div className="p-3 border-b border-theme">
+              <h3 className="text-secondary text-xs font-medium uppercase tracking-wide mb-3">
+                Temperature
+              </h3>
+              <div className="space-y-1">
+                <MenuItem
+                  label="Celsius (°C)"
+                  value="celsius"
+                  type="temperature"
+                />
+                <MenuItem
+                  label="Fahrenheit (°F)"
+                  value="fahrenheit"
+                  type="temperature"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Wind Speed Section */}
-          <div className="p-3 border-b border-theme">
-            <h3 className="text-secondary text-xs font-medium uppercase tracking-wide mb-3">
-              Wind Speed
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleUnitChange("windSpeed", "kmh")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                  isSelected("windSpeed", "kmh")
-                    ? "bg-card-hover hover:bg-button text-primary"
-                    : "text-secondary hover:bg-card-hover"
-                }`}
-              >
-                <span>km/h</span>
-                {isSelected("windSpeed", "kmh") && (
-                  <img
-                    src="src/assets/icon-checkmark.svg"
-                    alt=""
-                    className="w-4 h-4 icon-auto"
-                  />
-                )}
-              </button>
-              <button
-                onClick={() => handleUnitChange("windSpeed", "mph")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                  isSelected("windSpeed", "mph")
-                    ? "bg-card-hover hover:bg-button text-primary"
-                    : "text-secondary hover:bg-card-hover"
-                }`}
-              >
-                <span>mph</span>
-                {isSelected("windSpeed", "mph") && (
-                  <img
-                    src="src/assets/icon-checkmark.svg"
-                    alt=""
-                    className="w-4 h-4 icon-auto"
-                  />
-                )}
-              </button>
+            <div className="p-3 border-b border-theme">
+              <h3 className="text-secondary text-xs font-medium uppercase tracking-wide mb-3">
+                Wind Speed
+              </h3>
+              <div className="space-y-1">
+                <MenuItem label="km/h" value="kmh" type="windSpeed" />
+                <MenuItem label="mph" value="mph" type="windSpeed" />
+              </div>
             </div>
-          </div>
 
-          {/* Precipitation Section */}
-          <div className="p-3">
-            <h3 className="text-secondary text-xs font-medium uppercase tracking-wide mb-3">
-              Precipitation
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleUnitChange("precipitation", "mm")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                  isSelected("precipitation", "mm")
-                    ? "bg-card-hover hover:bg-button text-primary"
-                    : "text-secondary hover:bg-card-hover"
-                }`}
-              >
-                <span>Millimeters (mm)</span>
-                {isSelected("precipitation", "mm") && (
-                  <img
-                    src="src/assets/icon-checkmark.svg"
-                    alt=""
-                    className="w-4 h-4 icon-auto"
-                  />
-                )}
-              </button>
-              <button
-                onClick={() => handleUnitChange("precipitation", "inches")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
-                  isSelected("precipitation", "inches")
-                    ? "bg-card-hover hover:bg-button text-primary"
-                    : "text-secondary hover:bg-card-hover"
-                }`}
-              >
-                <span>Inches (in)</span>
-                {isSelected("precipitation", "inches") && (
-                  <img
-                    src="src/assets/icon-checkmark.svg"
-                    alt=""
-                    className="w-4 h-4 icon-auto"
-                  />
-                )}
-              </button>
+            <div className="p-3">
+              <h3 className="text-secondary text-xs font-medium uppercase tracking-wide mb-3">
+                Precipitation
+              </h3>
+              <div className="space-y-1">
+                <MenuItem
+                  label="Millimeters (mm)"
+                  value="mm"
+                  type="precipitation"
+                />
+                <MenuItem
+                  label="Inches (in)"
+                  value="inches"
+                  type="precipitation"
+                />
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

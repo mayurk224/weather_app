@@ -66,15 +66,27 @@ const calculateDaylightDuration = (sunrise, sunset) => {
 // --- Child Components ---
 
 // Refined InfoCard with subtle hover effects
-const InfoCard = ({ icon, label, value }) => (
-  <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 border border-white/10 group transition-all duration-300 hover:bg-white/10 hover:border-white/20">
+const InfoCard = ({ icon, label, value, id }) => (
+  <div
+    className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 border border-white/10 group transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+    role="region"
+    aria-labelledby={`${id}-label`}
+  >
     <div className="flex items-center gap-3 mb-2">
       <div className="p-2 bg-white/10 rounded-lg transition-transform duration-300 group-hover:scale-110">
         {icon}
       </div>
-      <span className="text-sm font-medium text-white/70">{label}</span>
+      <span id={`${id}-label`} className="text-sm font-medium text-white/70">
+        {label}
+      </span>
     </div>
-    <div className="text-2xl font-bold text-white tracking-tight">{value}</div>
+    <div
+      id={`${id}-value`}
+      className="text-2xl font-bold text-white tracking-tight"
+      aria-live="polite"
+    >
+      {value}
+    </div>
   </div>
 );
 
@@ -95,6 +107,7 @@ const Star = ({ style }) => (
       ease: "easeInOut",
       delay: Math.random() * 3,
     }}
+    aria-hidden="true"
   />
 );
 
@@ -105,6 +118,7 @@ const SunriseSunset = ({ data, loading = false }) => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const comboboxRef = useRef(null);
+  const comboboxButtonRef = useRef(null);
 
   // Update now state every minute
   useEffect(() => {
@@ -122,6 +136,19 @@ const SunriseSunset = ({ data, loading = false }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Handle keyboard navigation for combobox
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (isComboboxOpen && e.key === "Escape") {
+        setIsComboboxOpen(false);
+        comboboxButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isComboboxOpen]);
 
   // Memoized values for performance
   const {
@@ -238,6 +265,8 @@ const SunriseSunset = ({ data, loading = false }) => {
   return (
     <div
       className={`relative bg-gradient-to-br ${getSkyGradient()} rounded-lg p-6 sm:p-8 w-full overflow-hidden shadow-2xl transition-all duration-[2000ms]`}
+      role="region"
+      aria-label="Solar cycle information"
     >
       {/* Background Effects */}
       <AnimatePresence>
@@ -248,6 +277,7 @@ const SunriseSunset = ({ data, loading = false }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 2 }}
+            aria-hidden="true"
           >
             {stars.map((star, i) => (
               <Star key={i} style={star} />
@@ -255,20 +285,24 @@ const SunriseSunset = ({ data, loading = false }) => {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="absolute inset-0 bg-black/20" aria-hidden="true"></div>
 
       {/* Content */}
       <div className="relative z-10">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-yellow-300" />
+            <Sparkles className="w-6 h-6 text-yellow-300" aria-hidden="true" />
             Solar Cycle
           </h3>
           {/* Date Selector */}
           <div ref={comboboxRef} className="relative w-full sm:w-52">
             <button
               onClick={() => setIsComboboxOpen(!isComboboxOpen)}
+              ref={comboboxButtonRef}
               className="flex items-center justify-between bg-white/10 backdrop-blur-sm text-white px-4 py-2.5 rounded-full border border-white/20 w-full hover:bg-white/20 transition-colors"
+              aria-haspopup="true"
+              aria-expanded={isComboboxOpen}
+              aria-label="Select day for solar cycle information"
             >
               <span className="text-sm font-medium">
                 {next7Days[selectedDayIndex]?.isToday
@@ -276,7 +310,10 @@ const SunriseSunset = ({ data, loading = false }) => {
                   : next7Days[selectedDayIndex]?.formatted}
               </span>
               <motion.div animate={{ rotate: isComboboxOpen ? 180 : 0 }}>
-                <ChevronDown className="w-5 h-5 text-white/80" />
+                <ChevronDown
+                  className="w-5 h-5 text-white/80"
+                  aria-hidden="true"
+                />
               </motion.div>
             </button>
             <AnimatePresence>
@@ -286,6 +323,8 @@ const SunriseSunset = ({ data, loading = false }) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute top-full left-0 right-0 mt-2 bg-slate-800/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/10 z-20 overflow-hidden"
+                  role="menu"
+                  aria-label="Day selection menu"
                 >
                   {next7Days.map((day, index) => (
                     <div
@@ -293,9 +332,23 @@ const SunriseSunset = ({ data, loading = false }) => {
                       className={`px-4 py-3 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors ${
                         selectedDayIndex === index ? "bg-white/15" : ""
                       }`}
+                      role="menuitem"
+                      tabIndex={-1}
                       onClick={() => {
                         setSelectedDayIndex(index);
                         setIsComboboxOpen(false);
+                        comboboxButtonRef.current?.focus();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedDayIndex(index);
+                          setIsComboboxOpen(false);
+                          comboboxButtonRef.current?.focus();
+                        } else if (e.key === "Escape") {
+                          setIsComboboxOpen(false);
+                          comboboxButtonRef.current?.focus();
+                        }
                       }}
                     >
                       {day.isToday ? `${day.formatted} (Today)` : day.formatted}
@@ -313,6 +366,7 @@ const SunriseSunset = ({ data, loading = false }) => {
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 200 100"
             preserveAspectRatio="none"
+            aria-hidden="true"
           >
             <path
               d="M 10,90 Q 100,0 190,90"
@@ -333,6 +387,7 @@ const SunriseSunset = ({ data, loading = false }) => {
             }}
             transition={{ duration: 2, ease: "easeInOut" }}
             style={{ transform: "translateX(-50%)" }}
+            aria-hidden="true"
           >
             <motion.div
               key={isNight ? "moon" : "sun"}
@@ -340,22 +395,30 @@ const SunriseSunset = ({ data, loading = false }) => {
               initial={{ scale: 0, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              aria-hidden="true"
             >
               {isNight ? (
                 <>
-                  <div className="absolute inset-0 bg-blue-300 rounded-full blur-xl opacity-50"></div>
+                  <div
+                    className="absolute inset-0 bg-blue-300 rounded-full blur-xl opacity-50"
+                    aria-hidden="true"
+                  ></div>
                   <div className="relative bg-slate-400 w-full h-full rounded-full flex items-center justify-center">
                     <Moon
                       className="w-5 h-5 text-slate-800"
                       fill="currentColor"
+                      aria-hidden="true"
                     />
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-70"></div>
+                  <div
+                    className="absolute inset-0 bg-yellow-400 rounded-full blur-2xl opacity-70"
+                    aria-hidden="true"
+                  ></div>
                   <div className="relative bg-gradient-to-br from-yellow-400 to-orange-500 w-full h-full rounded-full flex items-center justify-center">
-                    <Sun className="w-6 h-6 text-white" />
+                    <Sun className="w-6 h-6 text-white" aria-hidden="true" />
                   </div>
                 </>
               )}
@@ -366,19 +429,28 @@ const SunriseSunset = ({ data, loading = false }) => {
         {/* Info Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <InfoCard
-            icon={<Sunrise className="w-5 h-5 text-orange-300" />}
+            icon={
+              <Sunrise className="w-5 h-5 text-orange-300" aria-hidden="true" />
+            }
             label="Sunrise"
             value={formatTime(sunrise)}
+            id="sunrise"
           />
           <InfoCard
-            icon={<Clock className="w-5 h-5 text-yellow-300" />}
+            icon={
+              <Clock className="w-5 h-5 text-yellow-300" aria-hidden="true" />
+            }
             label="Daylight"
             value={daylightDuration}
+            id="daylight"
           />
           <InfoCard
-            icon={<Sunset className="w-5 h-5 text-indigo-300" />}
+            icon={
+              <Sunset className="w-5 h-5 text-indigo-300" aria-hidden="true" />
+            }
             label="Sunset"
             value={formatTime(sunset)}
+            id="sunset"
           />
         </div>
 

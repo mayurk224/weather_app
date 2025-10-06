@@ -100,6 +100,8 @@ const DailyForecast = ({ data, loading, units }) => {
               onMouseLeave={(e) =>
                 (e.target.style.backgroundColor = "var(--card-hover-color)")
               }
+              role="region"
+              aria-label={`${day} forecast: High ${displayMaxTemp}${tempUnit}, Low ${displayMinTemp}${tempUnit}`}
             >
               {/* REMOVED: Fixed h-4 wrapper div. Let the h3 define its own height. */}
               <h3 className="font-medium">{day}</h3>
@@ -107,7 +109,7 @@ const DailyForecast = ({ data, loading, units }) => {
               {/* REMOVED: Fixed w-20 h-20 wrapper. Sized the image directly. */}
               <img
                 src={`src/assets/icon-${icon}.webp`}
-                alt={icon}
+                alt={`Weather condition: ${icon}`}
                 className="h-16 w-16 object-contain" // Sizing applied directly to the image
               />
 

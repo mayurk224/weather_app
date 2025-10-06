@@ -48,6 +48,9 @@ const Search = ({ onWeatherData }) => {
   const suggestionRef = useRef(null);
   const recognitionRef = useRef(null);
   const debounceTimerRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const voiceButtonRef = useRef(null);
+  const locationButtonRef = useRef(null);
 
   // Memoize handleCurrentLocation to use in useEffect dependency array
   const handleCurrentLocation = useCallback(async () => {
@@ -314,6 +317,21 @@ const Search = ({ onWeatherData }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Handle keyboard navigation for suggestions
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
+      searchInputRef.current?.focus();
+    } else if (e.key === "ArrowDown" && showSuggestions && results.length > 0) {
+      e.preventDefault();
+      // Focus first suggestion item
+      const firstSuggestion = document.querySelector(".suggestion-item");
+      if (firstSuggestion) {
+        firstSuggestion.focus();
+      }
+    }
+  };
+
   // Voice search functions
   const startVoiceSearch = () => {
     if (!voiceSupported) {
@@ -418,7 +436,11 @@ const Search = ({ onWeatherData }) => {
 
       {/* Voice Error Message */}
       {voiceError && (
-        <div className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm max-w-xl">
+        <div
+          className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm max-w-xl"
+          role="alert"
+          aria-live="assertive"
+        >
           {voiceError}
         </div>
       )}
@@ -429,15 +451,22 @@ const Search = ({ onWeatherData }) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            ref={searchInputRef}
             className="w-full py-3 pl-14 pr-24 rounded-lg outline-none text-primary border border-theme bg-card hover:bg-card-hover transition-colors"
             placeholder="Search for a city or click the mic..."
             onFocus={() => query.length >= 2 && setShowSuggestions(true)}
+            aria-autocomplete="list"
+            aria-controls="search-suggestions"
+            aria-expanded={showSuggestions}
+            role="combobox"
           />
 
           <img
             src="/src/assets/icon-search.svg"
             alt=""
             className="absolute left-5 top-1/2 transform -translate-y-1/2"
+            aria-hidden="true"
           />
 
           {/* Voice Search Button - Only show if supported */}
@@ -445,6 +474,7 @@ const Search = ({ onWeatherData }) => {
             <button
               onClick={isListening ? stopVoiceSearch : startVoiceSearch}
               disabled={isListening}
+              ref={voiceButtonRef}
               className={`absolute right-12 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-all duration-200 ${
                 isListening
                   ? "bg-red-500 hover:bg-red-600 animate-pulse scale-110"
@@ -455,6 +485,10 @@ const Search = ({ onWeatherData }) => {
                   ? "Listening... Click to stop"
                   : "Start voice search"
               }
+              aria-label={
+                isListening ? "Stop voice search" : "Start voice search"
+              }
+              aria-pressed={isListening}
             >
               <svg
                 className={`w-5 h-5 transition-colors ${
@@ -462,6 +496,7 @@ const Search = ({ onWeatherData }) => {
                 }`}
                 fill="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 {isListening ? (
                   // Stop icon when listening
@@ -481,14 +516,17 @@ const Search = ({ onWeatherData }) => {
           <button
             onClick={handleCurrentLocation}
             disabled={locationLoading}
+            ref={locationButtonRef}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-card-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Use current location"
+            aria-label="Use current location"
           >
             {locationLoading ? (
               <svg
                 className="w-5 h-5 text-primary animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <circle
                   className="opacity-25"
@@ -510,6 +548,7 @@ const Search = ({ onWeatherData }) => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -529,7 +568,11 @@ const Search = ({ onWeatherData }) => {
 
           {/* Voice Status Indicator */}
           {isListening && (
-            <div className="absolute -bottom-10 left-0 right-0 text-center">
+            <div
+              className="absolute -bottom-10 left-0 right-0 text-center"
+              role="status"
+              aria-live="polite"
+            >
               <div className="inline-flex items-center space-x-2 text-sm text-accent bg-card px-4 py-2 rounded-full border border-theme">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                 <span>Listening for city name...</span>
@@ -538,13 +581,18 @@ const Search = ({ onWeatherData }) => {
           )}
 
           {showSuggestions && (
-            <div className="suggestionBlock absolute top-full left-0 mt-3 w-full text-left space-y-2 bg-card p-3 rounded-lg z-50 border border-theme">
+            <div
+              id="search-suggestions"
+              className="suggestionBlock absolute top-full left-0 mt-3 w-full text-left space-y-2 bg-card p-3 rounded-lg z-50 border border-theme"
+              role="listbox"
+            >
               {loading && (
                 <div className="searchProgress flex items-center space-x-2 text-secondary p-1">
                   <img
                     src="/src/assets/icon-loading.svg"
                     alt=""
                     className="w-4 h-4 animate-spin"
+                    aria-hidden="true"
                   />
                   <h3>Search in progress</h3>
                 </div>
@@ -560,14 +608,41 @@ const Search = ({ onWeatherData }) => {
 
               {!loading && results.length > 0 && (
                 <div className="bg-card text-primary rounded-md mt-1 overflow-hidden">
-                  {results.map((city) => (
+                  {results.map((city, index) => (
                     <div
                       key={city.id}
-                      className="flex items-center justify-between p-2 hover:bg-card-hover group"
+                      className="flex items-center justify-between p-2 hover:bg-card-hover group suggestion-item"
+                      role="option"
+                      aria-selected="false"
+                      tabIndex={-1}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleSelectCity(city);
+                        } else if (e.key === "Escape") {
+                          setShowSuggestions(false);
+                          searchInputRef.current?.focus();
+                        } else if (e.key === "ArrowDown") {
+                          e.preventDefault();
+                          const next = e.target.nextElementSibling;
+                          if (next) {
+                            next.focus();
+                          }
+                        } else if (e.key === "ArrowUp") {
+                          e.preventDefault();
+                          const prev = e.target.previousElementSibling;
+                          if (prev) {
+                            prev.focus();
+                          } else {
+                            searchInputRef.current?.focus();
+                          }
+                        }
+                      }}
                     >
                       <div
                         className="flex-1 cursor-pointer"
                         onClick={() => handleSelectCity(city)}
+                        tabIndex={-1}
                       >
                         {city.name}
                         {city.admin1 ? `, ${city.admin1}` : ""} ({city.country})
@@ -583,11 +658,17 @@ const Search = ({ onWeatherData }) => {
                             ? "Remove from favorites"
                             : "Add to favorites"
                         }
+                        aria-label={
+                          isCityFavorite(city)
+                            ? `Remove ${city.name} from favorites`
+                            : `Add ${city.name} to favorites`
+                        }
                       >
                         {isCityFavorite(city) ? (
                           <svg
                             className="w-4 h-4 text-accent fill-current"
                             viewBox="0 0 24 24"
+                            aria-hidden="true"
                           >
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                           </svg>
@@ -597,6 +678,7 @@ const Search = ({ onWeatherData }) => {
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
+                            aria-hidden="true"
                           >
                             <path
                               strokeLinecap="round"
@@ -636,6 +718,7 @@ const Search = ({ onWeatherData }) => {
               }
             }
           }}
+          aria-label="Search for weather"
         >
           Search
         </button>

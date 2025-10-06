@@ -31,6 +31,7 @@ const HeroBlock = ({
   const [showFavorites, setShowFavorites] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const dropdownRef = useRef(null);
+  const favoritesButtonRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,6 +43,19 @@ const HeroBlock = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Handle keyboard navigation for favorites dropdown
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (showFavorites && e.key === "Escape") {
+        setShowFavorites(false);
+        favoritesButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showFavorites]);
 
   // Load favorites from localStorage when dropdown is opened
   const handleToggleDropdown = () => {
@@ -190,6 +204,7 @@ const HeroBlock = ({
               src="src/assets/icon-loading.svg"
               alt="Loading..."
               className="h-8 w-8 animate-spin icon-auto"
+              aria-hidden="true"
             />
             <span className="text-primary">Loading...</span>
           </div>
@@ -206,11 +221,14 @@ const HeroBlock = ({
                 </h1>
 
                 {/* Favorites Dropdown Button */}
-
                 <button
                   onClick={handleToggleDropdown}
+                  ref={favoritesButtonRef}
                   className=" hover:text-accent transition-colors p-2 h-8 flex items-center justify-center w-8 rounded-full hover:bg-white/10 absolute -right-9"
                   title="View favorite cities"
+                  aria-haspopup="true"
+                  aria-expanded={showFavorites}
+                  aria-label="Favorite cities"
                 >
                   <img
                     src="src/assets/icon-dropdown.svg"
@@ -220,6 +238,7 @@ const HeroBlock = ({
                         ? "rotate-180 transition-all ease-in-out"
                         : "transition-all ease-in-out"
                     }`}
+                    aria-hidden="true"
                   />
                 </button>
 
@@ -227,28 +246,38 @@ const HeroBlock = ({
                   <div
                     className="showFavoriteList absolute top-14 sm:left-3/4 left-1/2 -translate-x-1/2 
   mt-2 bg-card rounded-lg shadow-lg z-50 
-  min-w-[250px] max-h-60 overflow-y-auto"
+  w-64 max-h-60 overflow-y-auto border border-theme"
+                    role="menu"
+                    aria-label="Favorite cities menu"
                   >
                     {favorites.length === 0 ? (
-                      <div className="p-3 text-secondary text-center">
+                      <div className="p-4 text-center text-secondary">
                         No favorite cities yet
                       </div>
                     ) : (
-                      <div className="p-2">
-                        <div className="text-primary text-sm font-medium p-2 border-b border-theme">
-                          Favorite Cities
-                        </div>
+                      <div className="py-2">
                         {favorites.map((fav) => (
                           <div
                             key={`${fav.name}-${fav.country}`}
-                            className="flex items-center justify-between p-2 hover:bg-card-hover rounded-md group"
+                            className="px-4 py-2 flex items-center justify-between hover:bg-card-hover group"
+                            role="menuitem"
+                            tabIndex={-1}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handleSelectFavorite(fav);
+                              } else if (e.key === "Escape") {
+                                setShowFavorites(false);
+                                favoritesButtonRef.current?.focus();
+                              }
+                            }}
                           >
-                            <div
-                              className="flex-1 cursor-pointer text-primary"
+                            <button
                               onClick={() => handleSelectFavorite(fav)}
+                              className="flex-1 text-left"
                             >
                               {fav.name}, {fav.country}
-                            </div>
+                            </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -256,11 +285,13 @@ const HeroBlock = ({
                               }}
                               className="ml-2 p-1 rounded-md hover:bg-red-500/20 transition-colors"
                               title="Remove from favorites"
+                              aria-label={`Remove ${fav.name} from favorites`}
                             >
                               <svg
                                 className="w-4 h-4 text-accent"
                                 fill="currentColor"
                                 viewBox="0 0 24 24"
+                                aria-hidden="true"
                               >
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                               </svg>
@@ -281,7 +312,7 @@ const HeroBlock = ({
             <div className="flex items-center justify-center ">
               <img
                 src={`src/assets/icon-${iconName}.webp`}
-                alt="Weather icon"
+                alt={`Weather condition: ${iconName}`}
                 className="w-32 sm:w-32 lg:w-36 icon-no-invert"
               />
               <h1 className="text-white text-6xl sm:text-6xl lg:text-7xl font-bold bricolage-grotesque italic cursor-default">
@@ -299,28 +330,53 @@ const HeroBlock = ({
           {
             label: "Feels like",
             value: `${displayApparentTemperature}${tempUnit}`,
+            id: "feels-like",
           },
-          { label: "Humidity", value: `${relative_humidity_2m}%` },
-          { label: "Wind", value: `${displayWindSpeed} ${windUnit}` },
+          {
+            label: "Humidity",
+            value: `${relative_humidity_2m}%`,
+            id: "humidity",
+          },
+          {
+            label: "Wind",
+            value: `${displayWindSpeed} ${windUnit}`,
+            id: "wind",
+          },
           {
             label: "Precipitation",
             value: `${displayPrecipitation} ${precipUnit}`,
+            id: "precipitation",
           },
-          { label: "UV Index", value: uv_index },
-          { label: "Visibility", value: `${displayVisibility} km` },
-          { label: "Pressure", value: `${displayPressure} hPa` },
+          { label: "UV Index", value: uv_index, id: "uv-index" },
+          {
+            label: "Visibility",
+            value: `${displayVisibility} km`,
+            id: "visibility",
+          },
+          {
+            label: "Pressure",
+            value: `${displayPressure} hPa`,
+            id: "pressure",
+          },
         ].map((item, idx) => (
           <div
             key={idx}
             className={`bg-card-hover rounded-lg p-5 space-y-2 flex flex-col ${
               loading ? "animate-pulse bg-card" : ""
             }`}
+            role="region"
+            aria-labelledby={`${item.id}-label`}
           >
-            <h3 className="text-secondary text-sm">{item.label}</h3>
+            <h3 id={`${item.id}-label`} className="text-secondary text-sm">
+              {item.label}
+            </h3>
             {loading ? (
               <h1 className="text-primary text-2xl font-medium">—</h1>
             ) : (
-              <h1 className="text-primary text-2xl font-medium">
+              <h1
+                className="text-primary text-2xl font-medium"
+                aria-live="polite"
+              >
                 {item.value}
               </h1>
             )}
