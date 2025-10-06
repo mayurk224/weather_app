@@ -1,4 +1,5 @@
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion"; // Import motion and AnimatePresence
 import { convertTemperature, getTemperatureUnit } from "../utils/units";
 
 // Map weather code to icon name (No changes needed here)
@@ -18,26 +19,11 @@ const DailyForecast = ({ data, loading, units }) => {
   // Skeleton component - Updated to be flexible
   const SkeletonCard = () => (
     <div className="flex animate-pulse flex-col items-center space-y-2 rounded-lg bg-card p-3">
-      {/* REMOVED: Fixed h-4, w-12. Let the skeleton mimic the text size. */}
-      <div
-        className="h-5 w-14 rounded"
-        style={{ backgroundColor: "var(--border-color)" }}
-      ></div>
-      {/* REMOVED: Wrapper div. Size the image skeleton directly. */}
-      <div
-        className="h-16 w-16 rounded-full"
-        style={{ backgroundColor: "var(--border-color)" }}
-      ></div>
+      <div className="h-5 w-14 rounded bg-[var(--border-color)]"></div>
+      <div className="h-16 w-16 rounded-full bg-[var(--border-color)]"></div>
       <div className="flex w-full justify-between pt-1">
-        {/* REMOVED: Fixed h-4, w-10. */}
-        <div
-          className="h-5 w-10 rounded"
-          style={{ backgroundColor: "var(--border-color)" }}
-        ></div>
-        <div
-          className="h-5 w-10 rounded"
-          style={{ backgroundColor: "var(--border-color)" }}
-        ></div>
+        <div className="h-5 w-10 rounded bg-[var(--border-color)]"></div>
+        <div className="h-5 w-10 rounded bg-[var(--border-color)]"></div>
       </div>
     </div>
   );
@@ -46,11 +32,28 @@ const DailyForecast = ({ data, loading, units }) => {
   const gridClasses =
     "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-4";
 
+  // Animation variants for the container
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.07, // Stagger children by 0.07 seconds
+        delayChildren: 0.1, // Delay initial animation of children
+      },
+    },
+  };
+
+  // Animation variants for each individual forecast card
+  const cardVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
   if (loading) {
     return (
       <div className="mt-10 space-y-5">
         <h1 className="text-2xl font-bold text-primary">Daily Forecast</h1>
-        {/* CHANGED: Grid classes now match the data grid to prevent layout shift */}
         <div className={gridClasses}>
           {Array.from({ length: 7 }).map((_, idx) => (
             <SkeletonCard key={idx} />
@@ -70,7 +73,12 @@ const DailyForecast = ({ data, loading, units }) => {
     <div className="mt-10 space-y-5">
       <h1 className="text-2xl font-bold text-primary">Daily Forecast</h1>
 
-      <div className={gridClasses}>
+      <motion.div // Apply motion to the grid container
+        className={gridClasses}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {data.time.map((dateStr, idx) => {
           const dateObj = new Date(dateStr);
           const day = dateObj.toLocaleDateString("en-US", { weekday: "short" });
@@ -89,31 +97,24 @@ const DailyForecast = ({ data, loading, units }) => {
               : "-";
 
           return (
-            <div
+            <motion.div // Apply motion to each forecast card
               key={idx}
-              // REMOVED: min-w-[100px] as it's no longer needed. Adjusted spacing.
-              className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary transition-all duration-200 hover:scale-105 hover:bg-card-hover border border-theme"
-              style={{ "--hover-bg": "var(--card-hover-color)" }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "var(--card-hover-color)")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "var(--card-hover-color)")
-              }
+              variants={cardVariants}
+              whileHover={{
+                scale: 1.05,
+                backgroundColor: "var(--card-hover-color-deeper)",
+              }} // Slightly deeper hover color
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary border border-theme cursor-pointer"
               role="region"
               aria-label={`${day} forecast: High ${displayMaxTemp}${tempUnit}, Low ${displayMinTemp}${tempUnit}`}
             >
-              {/* REMOVED: Fixed h-4 wrapper div. Let the h3 define its own height. */}
               <h3 className="font-medium">{day}</h3>
-
-              {/* REMOVED: Fixed w-20 h-20 wrapper. Sized the image directly. */}
               <img
                 src={`src/assets/icon-${icon}.webp`}
                 alt={`Weather condition: ${icon}`}
-                className="h-16 w-16 object-contain" // Sizing applied directly to the image
+                className="h-16 w-16 object-contain"
               />
-
-              {/* REMOVED: Fixed h-4 wrappers. Let content define height. */}
               <div className="flex w-full justify-between pt-1 text-sm">
                 <span className="font-semibold">
                   {displayMaxTemp}
@@ -124,10 +125,10 @@ const DailyForecast = ({ data, loading, units }) => {
                   {tempUnit}
                 </span>
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 };
