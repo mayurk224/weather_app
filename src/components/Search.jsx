@@ -189,20 +189,80 @@ const Search = ({ onWeatherData }) => {
   }, []);
 
   const startVoiceSearch = () => {
-    /* ... */
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch (err) {
+        setVoiceError("Voice recognition error. Please try again.");
+        console.error("Voice recognition error:", err);
+      }
+    }
   };
+
   const stopVoiceSearch = () => {
-    /* ... */
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
   };
 
   const handleSelectCity = async (city) => {
-    /* ... */
+    setQuery(`${city.name}, ${city.admin1}, ${city.country}`);
+    setResults([]);
+    setShowSuggestions(false);
+
+    try {
+      const weatherData = await requestQueue.add(() =>
+        getWeatherData(city.latitude, city.longitude)
+      );
+
+      localStorage.setItem(
+        "lastCity",
+        JSON.stringify({
+          name: city.name,
+          country: city.country,
+          lat: city.latitude,
+          lon: city.longitude,
+        })
+      );
+
+      if (onWeatherData) onWeatherData({ city, weather: weatherData });
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      alert("Failed to fetch weather data. Please try again.");
+    }
   };
+
   const toggleFavorite = (city) => {
-    /* ... */
+    const isFavorite = isCityFavorite(city);
+    let newFavorites;
+
+    if (isFavorite) {
+      newFavorites = favorites.filter(
+        (fav) => fav.id !== `${city.latitude}-${city.longitude}`
+      );
+    } else {
+      newFavorites = [
+        ...favorites,
+        {
+          id: `${city.latitude}-${city.longitude}`,
+          name: city.name,
+          country: city.country,
+          admin1: city.admin1,
+          latitude: city.latitude,
+          longitude: city.longitude,
+        },
+      ];
+    }
+
+    setFavorites(newFavorites);
+    localStorage.setItem("favoriteCities", JSON.stringify(newFavorites));
   };
+
   const isCityFavorite = (city) => {
-    /* ... */
+    return favorites.some(
+      (fav) => fav.id === `${city.latitude}-${city.longitude}`
+    );
   };
 
   // Animation Variants
@@ -327,7 +387,54 @@ const Search = ({ onWeatherData }) => {
                 animate="visible"
                 exit="hidden"
               >
-                {/* ... (suggestion items with motion.div wrappers and variants) */}
+                {loading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <LoaderCircle className="w-5 h-5 text-primary animate-spin" />
+                  </div>
+                ) : results.length > 0 ? (
+                  results.map((city) => (
+                    <motion.div
+                      key={`${city.latitude}-${city.longitude}`}
+                      className="flex items-center justify-between p-3 rounded-lg hover:bg-card-hover cursor-pointer transition-colors"
+                      variants={itemVariants}
+                      onClick={() => handleSelectCity(city)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="w-4 h-4 text-secondary" />
+                        <div>
+                          <div className="font-medium text-primary">
+                            {city.name}
+                          </div>
+                          <div className="text-sm text-secondary">
+                            {city.admin1}, {city.country}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(city);
+                        }}
+                        className="p-1 rounded-full hover:bg-card-hover"
+                      >
+                        <Star
+                          className={`w-4 h-4 ${
+                            isCityFavorite(city)
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-secondary"
+                          }`}
+                        />
+                      </button>
+                    </motion.div>
+                  ))
+                ) : query.length >= 2 ? (
+                  <motion.div
+                    className="p-3 text-center text-secondary"
+                    variants={itemVariants}
+                  >
+                    No cities found
+                  </motion.div>
+                ) : null}
               </motion.div>
             )}
           </AnimatePresence>
@@ -335,7 +442,10 @@ const Search = ({ onWeatherData }) => {
         <motion.button
           className="bg-button hover:bg-button-hover text-white rounded-lg px-4 py-3 w-full lg:w-auto lg:min-w-[120px] transition-colors"
           onClick={() => {
-            /* ... */
+            // Handle search button click
+            if (query && results.length > 0) {
+              handleSelectCity(results[0]);
+            }
           }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
