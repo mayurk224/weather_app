@@ -9,7 +9,17 @@ import {
   getPrecipitationUnit,
 } from "../utils/units";
 import { getWeatherData } from "../utils/api";
-import { Sparkles, Thermometer, ChevronDown, X } from "lucide-react"; // Added ChevronDown and X for favorites dropdown
+import { Sparkles, Thermometer, ChevronDown, X } from "lucide-react";
+import bgTodaySmall from "../assets/bg-today-small.svg";
+import iconLoading from "../assets/icon-loading.svg";
+import iconSunny from "../assets/icon-sunny.webp";
+import iconPartlyCloudy from "../assets/icon-partly-cloudy.webp";
+import iconOvercast from "../assets/icon-overcast.webp";
+import iconFog from "../assets/icon-fog.webp";
+import iconDrizzle from "../assets/icon-drizzle.webp";
+import iconRain from "../assets/icon-rain.webp";
+import iconSnow from "../assets/icon-snow.webp";
+import iconStorm from "../assets/icon-storm.webp";
 
 const HeroBlock = ({
   city,
@@ -132,6 +142,20 @@ const HeroBlock = ({
 
   let code = Array.isArray(weather_code) ? weather_code[0] : weather_code;
   const iconName = getIconName(Number(code));
+  
+  // Create a mapping of icon names to imported images
+  const iconMap = {
+    "sunny": iconSunny,
+    "partly-cloudy": iconPartlyCloudy,
+    "overcast": iconOvercast,
+    "fog": iconFog,
+    "drizzle": iconDrizzle,
+    "rain": iconRain,
+    "snow": iconSnow,
+    "storm": iconStorm
+  };
+  
+  const currentIcon = iconMap[iconName] || iconOvercast;
 
   const displayTemperature = Math.round(
     convertTemperature(temperature_2m, units.temperature)
@@ -197,7 +221,7 @@ const HeroBlock = ({
         style={
           !loading
             ? {
-                backgroundImage: `url('src/assets/bg-today-small.svg')`,
+                backgroundImage: `url('${bgTodaySmall}')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
@@ -207,7 +231,7 @@ const HeroBlock = ({
         {loading ? (
           <div className="flex flex-col items-center justify-center gap-4 mx-auto">
             <img
-              src="src/assets/icon-loading.svg"
+              src={iconLoading}
               alt="Loading..."
               className="h-8 w-8 animate-spin icon-auto"
               aria-hidden="true"
@@ -317,7 +341,7 @@ const HeroBlock = ({
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <motion.img
-                src={`src/assets/icon-${iconName}.webp`}
+                src={currentIcon}
                 alt={`Weather condition: ${iconName}`}
                 className="w-32 sm:w-32 lg:w-36 icon-no-invert"
                 initial={{ opacity: 0, rotate: -30 }}

@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Search from "../components/Search.jsx";
+import HeroBlock from "../components/HeroBlock.jsx";
+import DailyForecast from "../components/DailyForecast.jsx";
+import HourlyForecast from "../components/HourlyForecast.jsx";
+import SunriseSunset from "../components/SunriseSunset.jsx";
+import UnitsCombobox from "../components/UnitsCombobox.jsx";
+import ApiError from "../components/ApiError.jsx";
+import logo from "../assets/logo.svg";
 import { getWeatherData } from "../utils/api";
-import ApiError from "../components/ApiError";
-import DailyForecast from "../components/DailyForecast";
-import HeroBlock from "../components/HeroBlock";
-import HourlyForecast from "../components/HourlyForecast";
-import Search from "../components/Search";
-import SunriseSunset from "../components/SunriseSunset";
-import UnitsCombobox from "../components/UnitsCombobox"; // Import UnitsCombobox
 
 const Home = () => {
   const [weatherData, setWeatherData] = useState(null);
@@ -87,9 +88,9 @@ const Home = () => {
           <div className="flex items-center justify-between gap-4">
             <div className="logo flex-shrink-0">
               <img
-                src="src/assets/logo.svg"
+                src={logo}
                 alt="Logo"
-                className="h-9 sm:h-10 icon-auto" // Use w-auto instead of a custom class
+                className="h-9 sm:h-10 icon-auto"
               />
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">

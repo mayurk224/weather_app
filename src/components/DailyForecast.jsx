@@ -1,6 +1,14 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Import motion and AnimatePresence
+import { motion, AnimatePresence } from "framer-motion";
 import { convertTemperature, getTemperatureUnit } from "../utils/units";
+import iconSunny from "../assets/icon-sunny.webp";
+import iconPartlyCloudy from "../assets/icon-partly-cloudy.webp";
+import iconOvercast from "../assets/icon-overcast.webp";
+import iconFog from "../assets/icon-fog.webp";
+import iconDrizzle from "../assets/icon-drizzle.webp";
+import iconRain from "../assets/icon-rain.webp";
+import iconSnow from "../assets/icon-snow.webp";
+import iconStorm from "../assets/icon-storm.webp";
 
 // Map weather code to icon name (No changes needed here)
 const getIconName = (code) => {
@@ -68,12 +76,24 @@ const DailyForecast = ({ data, loading, units }) => {
   }
 
   const tempUnit = getTemperatureUnit(units.temperature);
+  
+  // Create a mapping of icon names to imported images
+  const iconMap = {
+    "sunny": iconSunny,
+    "partly-cloudy": iconPartlyCloudy,
+    "overcast": iconOvercast,
+    "fog": iconFog,
+    "drizzle": iconDrizzle,
+    "rain": iconRain,
+    "snow": iconSnow,
+    "storm": iconStorm
+  };
 
   return (
     <div className="mt-10 space-y-5">
       <h1 className="text-2xl font-bold text-primary">Daily Forecast</h1>
 
-      <motion.div // Apply motion to the grid container
+      <motion.div
         className={gridClasses}
         variants={containerVariants}
         initial="hidden"
@@ -86,6 +106,9 @@ const DailyForecast = ({ data, loading, units }) => {
           const maxCelsius = data.temperature_2m_max?.[idx] ?? "-";
           const code = data.weather_code?.[idx];
           const icon = getIconName(Number(code));
+          
+          // Get the proper icon image
+          const iconImage = iconMap[icon] || iconOvercast;
 
           const displayMinTemp =
             minCelsius !== "-"
@@ -97,13 +120,13 @@ const DailyForecast = ({ data, loading, units }) => {
               : "-";
 
           return (
-            <motion.div // Apply motion to each forecast card
+            <motion.div
               key={idx}
               variants={cardVariants}
               whileHover={{
                 scale: 1.05,
                 backgroundColor: "var(--card-hover-color-deeper)",
-              }} // Slightly deeper hover color
+              }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary border border-theme cursor-pointer"
               role="region"
@@ -111,7 +134,7 @@ const DailyForecast = ({ data, loading, units }) => {
             >
               <h3 className="font-medium">{day}</h3>
               <img
-                src={`src/assets/icon-${icon}.webp`}
+                src={iconImage}
                 alt={`Weather condition: ${icon}`}
                 className="h-16 w-16 object-contain"
               />

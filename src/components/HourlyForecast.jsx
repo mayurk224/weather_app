@@ -2,19 +2,27 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { convertTemperature, getTemperatureUnit } from "../utils/units";
+import iconSunny from "../assets/icon-sunny.webp";
+import iconPartlyCloudy from "../assets/icon-partly-cloudy.webp";
+import iconOvercast from "../assets/icon-overcast.webp";
+import iconFog from "../assets/icon-fog.webp";
+import iconDrizzle from "../assets/icon-drizzle.webp";
+import iconRain from "../assets/icon-rain.webp";
+import iconSnow from "../assets/icon-snow.webp";
+import iconStorm from "../assets/icon-storm.webp";
 
-// (Keep your weatherIcons mapping as is)
+// Updated weatherIcons mapping to use imported images
 const weatherIcons = {
-  0: "src/assets/icon-sunny.webp",
-  1: "src/assets/icon-partly-cloudy.webp",
-  2: "src/assets/icon-partly-cloudy.webp",
-  3: "src/assets/icon-overcast.webp",
-  45: "src/assets/icon-fog.webp",
-  48: "src/assets/icon-fog.webp",
-  51: "src/assets/icon-drizzle.webp",
-  61: "src/assets/icon-rain.webp",
-  71: "src/assets/icon-snow.webp",
-  95: "src/assets/icon-storm.webp",
+  0: iconSunny,
+  1: iconPartlyCloudy,
+  2: iconPartlyCloudy,
+  3: iconOvercast,
+  45: iconFog,
+  48: iconFog,
+  51: iconDrizzle,
+  61: iconRain,
+  71: iconSnow,
+  95: iconStorm,
 };
 
 export default function HourlyForecast({ data, loading, units }) {
