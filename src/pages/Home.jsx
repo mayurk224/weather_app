@@ -8,6 +8,7 @@ import UnitsCombobox from "../components/UnitsCombobox.jsx";
 import ApiError from "../components/ApiError.jsx";
 import logo from "../assets/logo.svg";
 import { getWeatherData } from "../utils/api";
+import SpeedDial from "../components/SpeedDial.jsx";
 
 const Home = () => {
   const [weatherData, setWeatherData] = useState(null);
@@ -87,11 +88,7 @@ const Home = () => {
         <div className="lg:py-6 p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="logo flex-shrink-0">
-              <img
-                src={logo}
-                alt="Logo"
-                className="h-9 sm:h-10 icon-auto"
-              />
+              <img src={logo} alt="Logo" className="h-9 sm:h-10 icon-auto" />
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
               <UnitsCombobox units={units} onUnitsChange={handleUnitsChange} />
@@ -108,33 +105,38 @@ const Home = () => {
               - Added mb-8 and lg:mb-0 to create vertical space on mobile but not on desktop.
             */}
                 <div className="lg:w-2/3 mb-8 lg:mb-0">
-                  <HeroBlock
-                    city={city.name}
-                    country={city.country}
-                    apparent_temperature={apparent_temperature}
-                    precipitation={precipitation}
-                    relative_humidity_2m={relative_humidity_2m}
-                    wind_speed_10m={wind_speed_10m}
-                    weather_code={weather_code}
-                    temperature_2m={temperature_2m}
-                    time={time}
-                    loading={loading}
-                    units={units}
-                    onWeatherData={handleWeatherData}
-                    // New props
-                    uv_index={uv_index}
-                    visibility={visibility}
-                    pressure_msl={pressure_msl}
-                  />
+                  {/* Added id for Current Weather section */}
+                  <div id="current-weather">
+                    <HeroBlock
+                      city={city.name}
+                      country={city.country}
+                      apparent_temperature={apparent_temperature}
+                      precipitation={precipitation}
+                      relative_humidity_2m={relative_humidity_2m}
+                      wind_speed_10m={wind_speed_10m}
+                      weather_code={weather_code}
+                      temperature_2m={temperature_2m}
+                      time={time}
+                      loading={loading}
+                      units={units}
+                      onWeatherData={handleWeatherData}
+                      // New props
+                      uv_index={uv_index}
+                      visibility={visibility}
+                      pressure_msl={pressure_msl}
+                    />
+                  </div>
                   {/* Added a margin-top to space it from the HeroBlock above it */}
-                  <div className="mt-8">
+                  {/* Added id for Daily Forecast section */}
+                  <div id="daily-forecast" className="mt-8">
                     <DailyForecast
                       data={daily}
                       loading={loading}
                       units={units}
                     />
                   </div>
-                  <div className="mt-8">
+                  {/* Added id for Solar Cycle section */}
+                  <div id="solar-cycle" className="mt-8">
                     <SunriseSunset data={daily} loading={loading} />
                   </div>
                 </div>
@@ -143,17 +145,21 @@ const Home = () => {
               - This ensures the layout is a predictable 2/3 + 1/3 split.
             */}
                 <div className="lg:w-1/3">
-                  <HourlyForecast
-                    data={hourly}
-                    loading={loading}
-                    units={units}
-                  />
+                  {/* Added id for Hourly Forecast section */}
+                  <div id="hourly-forecast">
+                    <HourlyForecast
+                      data={hourly}
+                      loading={loading}
+                      units={units}
+                    />
+                  </div>
                   {/* Add SunriseSunset component */}
                 </div>
               </div>
             </>
           )}
         </div>
+        <SpeedDial />
       </div>
       {/* Footer with creator's name */}
       <footer className="text-center py-4 text-sm text-gray-500">
