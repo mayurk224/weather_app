@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -41,6 +41,27 @@ const actions = [
 
 const SpeedDial = () => {
   const { isSpeedDialOpen, setIsSpeedDialOpen } = useSpeedDial();
+  const speedDialRef = useRef(null);
+
+  // Close SpeedDial when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        speedDialRef.current &&
+        !speedDialRef.current.contains(event.target)
+      ) {
+        setIsSpeedDialOpen(false);
+      }
+    };
+
+    if (isSpeedDialOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSpeedDialOpen, setIsSpeedDialOpen]);
 
   // Animation variants for the list container
   const listVariants = {
@@ -89,8 +110,10 @@ const SpeedDial = () => {
   };
 
   return (
-    // Added lg:hidden to hide on large screens and right-8 lg:right-4 to keep button on right
-    <div className="fixed bottom-8 right-8 lg:right-4 z-50 flex flex-col items-end gap-3 lg:hidden">
+    <div
+      ref={speedDialRef}
+      className="fixed bottom-8 right-8 lg:right-4 z-50 flex flex-col items-end gap-3 lg:hidden"
+    >
       <AnimatePresence>
         {isSpeedDialOpen && (
           <motion.div
@@ -110,7 +133,7 @@ const SpeedDial = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="bg-slate-800/80 backdrop-blur-md text-sm text-white px-3 py-1.5 rounded-lg shadow-md">
+                <span className="bg-card backdrop-blur-md text-sm px-3 py-1.5 rounded-lg shadow-md">
                   {action.label}
                 </span>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card-hover shadow-lg border border-theme text-primary">
