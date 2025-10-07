@@ -76,17 +76,17 @@ const DailyForecast = ({ data, loading, units }) => {
   }
 
   const tempUnit = getTemperatureUnit(units.temperature);
-  
+
   // Create a mapping of icon names to imported images
   const iconMap = {
-    "sunny": iconSunny,
+    sunny: iconSunny,
     "partly-cloudy": iconPartlyCloudy,
-    "overcast": iconOvercast,
-    "fog": iconFog,
-    "drizzle": iconDrizzle,
-    "rain": iconRain,
-    "snow": iconSnow,
-    "storm": iconStorm
+    overcast: iconOvercast,
+    fog: iconFog,
+    drizzle: iconDrizzle,
+    rain: iconRain,
+    snow: iconSnow,
+    storm: iconStorm,
   };
 
   return (
@@ -106,7 +106,7 @@ const DailyForecast = ({ data, loading, units }) => {
           const maxCelsius = data.temperature_2m_max?.[idx] ?? "-";
           const code = data.weather_code?.[idx];
           const icon = getIconName(Number(code));
-          
+
           // Get the proper icon image
           const iconImage = iconMap[icon] || iconOvercast;
 
@@ -125,10 +125,9 @@ const DailyForecast = ({ data, loading, units }) => {
               variants={cardVariants}
               whileHover={{
                 scale: 1.05,
-                backgroundColor: "var(--card-hover-color-deeper)",
               }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary border border-theme cursor-pointer"
+              className="flex flex-col items-center space-y-2 rounded-lg bg-card-hover p-3 text-center text-primary border border-theme cursor-pointer hover:bg-card-hover transition-colors duration-200"
               role="region"
               aria-label={`${day} forecast: High ${displayMaxTemp}${tempUnit}, Low ${displayMinTemp}${tempUnit}`}
             >
