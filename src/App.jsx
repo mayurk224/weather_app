@@ -1,10 +1,13 @@
 import Home from "./pages/Home";
+import { SpeedDialProvider } from "./components/SpeedDialContext";
 
 const App = () => {
   return (
-    <div>
-      <Home />
-    </div>
+    <SpeedDialProvider>
+      <div>
+        <Home />
+      </div>
+    </SpeedDialProvider>
   );
 };
 

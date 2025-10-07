@@ -9,6 +9,7 @@ import ApiError from "../components/ApiError.jsx";
 import logo from "../assets/logo.svg";
 import { getWeatherData } from "../utils/api";
 import SpeedDial from "../components/SpeedDial.jsx";
+import ScrollToTop from "../components/ScrollToTop.jsx";
 
 const Home = () => {
   const [weatherData, setWeatherData] = useState(null);
@@ -160,6 +161,7 @@ const Home = () => {
           )}
         </div>
         <SpeedDial />
+        <ScrollToTop />
       </div>
       {/* Footer with creator's name */}
       <footer className="text-center py-4 text-sm text-gray-500">

@@ -9,6 +9,7 @@ import {
   Clock4,
   EllipsisVertical,
 } from "lucide-react";
+import { useSpeedDial } from "./SpeedDialContext";
 
 // Define the actions for the speed dial in the required sequence
 const actions = [
@@ -39,7 +40,7 @@ const actions = [
 ];
 
 const SpeedDial = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isSpeedDialOpen, setIsSpeedDialOpen } = useSpeedDial();
 
   // Animation variants for the list container
   const listVariants = {
@@ -84,14 +85,14 @@ const SpeedDial = () => {
         block: "start",
       });
     }
-    setIsOpen(false);
+    setIsSpeedDialOpen(false);
   };
 
   return (
     // Added lg:hidden to hide on large screens and right-8 lg:right-4 to keep button on right
     <div className="fixed bottom-8 right-8 lg:right-4 z-50 flex flex-col items-end gap-3 lg:hidden">
       <AnimatePresence>
-        {isOpen && (
+        {isSpeedDialOpen && (
           <motion.div
             className="flex flex-col items-end gap-3"
             variants={listVariants}
@@ -124,21 +125,21 @@ const SpeedDial = () => {
       {/* Added ml-auto to keep the toggle button on the right */}
       <motion.button
         className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-700 transition-colors ml-auto"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsSpeedDialOpen(!isSpeedDialOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        aria-expanded={isOpen}
+        aria-expanded={isSpeedDialOpen}
         aria-label="Toggle quick actions menu"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={isOpen ? "x" : "plus"}
+            key={isSpeedDialOpen ? "x" : "plus"}
             initial={{ y: -20, opacity: 0, rotate: -45 }}
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             exit={{ y: 20, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.2 }}
           >
-            {isOpen ? <X size={24} /> : <EllipsisVertical size={24} />}
+            {isSpeedDialOpen ? <X size={24} /> : <EllipsisVertical size={24} />}
           </motion.div>
         </AnimatePresence>
       </motion.button>
