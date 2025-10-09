@@ -24,6 +24,8 @@ A modern, feature-rich weather application built with React and Vite, designed t
 - **Responsive design** for all device sizes
 - **Animated transitions** for smooth interactions
 - **Unit customization** for temperature, wind speed, and precipitation
+- **SpeedDial** Provides quick access to key weather features through a floating action SpeedDial menu. 
+- **ScrollToTop** Allows users to quickly return to the top of the page with a single click.
 
 ## Smart Caching System
 
