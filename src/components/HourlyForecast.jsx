@@ -134,7 +134,7 @@ export default function HourlyForecast({ data, loading, units }) {
       <div className="flex items-center justify-between p-5">
         <h2 className="text-lg font-medium text-primary">Hourly Forecast</h2>
         <div className="relative inline-block text-left" ref={dropdownRef}>
-          <button
+          <motion.button
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.95 }}
             className="flex items-center rounded-lg border border-theme bg-card-hover px-3 py-2 text-primary transition-colors hover:bg-button"
@@ -147,7 +147,7 @@ export default function HourlyForecast({ data, loading, units }) {
             <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
               <ChevronDown className="ml-1 h-4 w-4 text-secondary" />
             </motion.div>
-          </button>
+          </motion.button>
 
           <AnimatePresence>
             {isOpen && (

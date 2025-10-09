@@ -87,18 +87,23 @@ const Home = () => {
       {/* Added a container to center and constrain the max-width on large screens */}
       <div className="mx-auto max-w-[1440px] lg:px-8">
         <div className="lg:py-6 p-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="logo flex-shrink-0">
-              <img src={logo} alt="Logo" className="h-9 sm:h-10 icon-auto" />
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <UnitsCombobox units={units} onUnitsChange={handleUnitsChange} />
-            </div>
-          </div>
+          <header>
+            <nav className="flex items-center justify-between gap-4">
+              <div className="logo flex-shrink-0">
+                <img src={logo} alt="Logo" className="h-9 sm:h-10 icon-auto" />
+              </div>
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <UnitsCombobox
+                  units={units}
+                  onUnitsChange={handleUnitsChange}
+                />
+              </div>
+            </nav>
+          </header>
           {apiError ? (
             <ApiError />
           ) : (
-            <>
+            <main>
               <Search onWeatherData={handleWeatherData} />
               {/* This container now controls the two-column layout on desktop */}
               <div className="lg:mt-10 mt-8 lg:flex lg:space-x-8">
@@ -157,7 +162,7 @@ const Home = () => {
                   {/* Add SunriseSunset component */}
                 </div>
               </div>
-            </>
+            </main>
           )}
         </div>
         <SpeedDial />
@@ -165,7 +170,7 @@ const Home = () => {
       </div>
       {/* Footer with creator's name */}
       <footer className="text-center py-4 text-sm text-gray-500">
-        <div class="attribution">
+        <div className="attribution">
           Challenge by{" "}
           <a href="https://www.frontendmentor.io/challenges/weather-app-K1FhddVm49">
             Frontend Mentor

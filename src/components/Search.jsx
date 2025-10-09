@@ -342,6 +342,7 @@ const Search = ({ onWeatherData }) => {
               }`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              aria-label="Voice search"
             >
               <Mic className="w-5 h-5" />
             </motion.button>
@@ -353,6 +354,7 @@ const Search = ({ onWeatherData }) => {
             className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md hover:bg-card-hover disabled:opacity-50"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            aria-label="Get current location"
           >
             {locationLoading ? (
               <LoaderCircle className="w-5 h-5 text-primary animate-spin" />
@@ -441,6 +443,7 @@ const Search = ({ onWeatherData }) => {
         </div>
         <motion.button
           className="bg-button hover:bg-button-hover text-white rounded-lg px-4 py-3 w-full lg:w-auto lg:min-w-[120px] transition-colors"
+          aria-label="Search"
           onClick={() => {
             // Handle search button click
             if (query && results.length > 0) {

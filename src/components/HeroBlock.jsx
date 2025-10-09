@@ -142,19 +142,19 @@ const HeroBlock = ({
 
   let code = Array.isArray(weather_code) ? weather_code[0] : weather_code;
   const iconName = getIconName(Number(code));
-  
+
   // Create a mapping of icon names to imported images
   const iconMap = {
-    "sunny": iconSunny,
+    sunny: iconSunny,
     "partly-cloudy": iconPartlyCloudy,
-    "overcast": iconOvercast,
-    "fog": iconFog,
-    "drizzle": iconDrizzle,
-    "rain": iconRain,
-    "snow": iconSnow,
-    "storm": iconStorm
+    overcast: iconOvercast,
+    fog: iconFog,
+    drizzle: iconDrizzle,
+    rain: iconRain,
+    snow: iconSnow,
+    storm: iconStorm,
   };
-  
+
   const currentIcon = iconMap[iconName] || iconOvercast;
 
   const displayTemperature = Math.round(
@@ -411,7 +411,7 @@ const HeroBlock = ({
             role="region"
             aria-labelledby={`${item.id}-label`}
           >
-            <h3 id={`${item.id}-label`} className="text-secondary text-sm">
+            <h3 id={`${item.id}-label`} className="text-secondary text-md">
               {item.label}
             </h3>
             {loading ? (
