@@ -2,8 +2,8 @@
 
 A modern, feature-rich weather application built with **React** and **Vite**, designed to efficiently serve **3,000–5,000 daily active users** while staying within **Open-Meteo's free tier limits (10,000 API calls/day)**.
 
-🔗 **Live Demo:** [https://weatherflow-react.vercel.app]([https://weatherflow-react.vercel.app](https://weather-app-three-theta-38.vercel.app/))
-💻 **GitHub Repository:** ([https://github.com/mayur-portfolio/weather-app](https://github.com/mayurk224/weather_app))
+🔗 **Live Demo:** [https://weather-app-three-theta-38.vercel.app](https://weather-app-three-theta-38.vercel.app)
+💻 **GitHub Repository:** [https://github.com/mayurk224/weather_app](https://github.com/mayurk224/weather_app)
 
 ![Weather App Preview](src/assets/preview.png)
 
@@ -29,11 +29,11 @@ A modern, feature-rich weather application built with **React** and **Vite**, de
 ### 🧭 User Experience
 
 * **Light/Dark theme switching** with system preference detection
-* **Responsive design** for all device sizes
+* **Responsive design** for all screen sizes
 * **Animated transitions** for smooth interactions
 * **Unit customization** for temperature, wind speed, and precipitation
-* **SpeedDial** for quick feature access
-* **ScrollToTop** for seamless navigation
+* **SpeedDial menu** for quick access to core features
+* **ScrollToTop button** for enhanced navigation
 
 ---
 
@@ -43,17 +43,17 @@ To optimize API usage and improve performance, the app implements a **multi-laye
 
 ### 🧠 In-Memory Caching
 
-* **Current weather data**: Cached for 15 minutes
-* **Daily forecast data**: Cached for 1 hour
-* **Geocoding data**: Cached for 24 hours
+* **Current weather data:** Cached for 15 minutes
+* **Daily forecast data:** Cached for 1 hour
+* **Geocoding data:** Cached for 24 hours
 
 ### ⚡ Performance Optimizations
 
-* **Request Queue Management**: Prevents API rate limiting
-* **Debouncing (300ms)**: Avoids excessive API calls during input
-* **LocalStorage Persistence**: Stores user preferences and favorites
+* **Request Queue Management:** Prevents API rate limiting
+* **Input Debouncing (300ms):** Reduces unnecessary API calls
+* **LocalStorage Persistence:** Saves user preferences and last searched city
 
-For details, see [CACHING_STRATEGY.md](CACHING_STRATEGY.md).
+For detailed caching logic, see [CACHING_STRATEGY.md](CACHING_STRATEGY.md).
 
 ---
 
@@ -61,17 +61,23 @@ For details, see [CACHING_STRATEGY.md](CACHING_STRATEGY.md).
 
 ### Frontend
 
-* **React 18**, **Vite**, **Tailwind CSS**, **Framer Motion**, **Lucide React**
+* **React 18** with hooks and functional components
+* **Vite** for ultra-fast development and build performance
+* **Tailwind CSS** for responsive, modern UI design
+* **Framer Motion** for animations
+* **Lucide React** for clean and consistent icons
 
 ### APIs
 
-* **Open-Meteo API** (Weather data)
-* **Nominatim OpenStreetMap API** (Reverse geocoding)
-* **Web Speech API** (Voice search)
+* **Open-Meteo API** — real-time and forecast weather data
+* **Nominatim OpenStreetMap API** — reverse geocoding
+* **Web Speech API** — enables voice search functionality
 
-### Build & Development
+### Build & Development Tools
 
-* **ESLint**, **PostCSS**, **Workbox** (Service Worker)
+* **ESLint** for code quality
+* **PostCSS** for CSS processing
+* **Workbox** for service worker integration
 
 ---
 
@@ -85,7 +91,7 @@ For details, see [CACHING_STRATEGY.md](CACHING_STRATEGY.md).
 ### Installation
 
 ```bash
-git clone https://github.com/mayur-portfolio/weather-app.git
+git clone https://github.com/mayurk224/weather_app.git
 cd weather_app
 npm install
 ```
@@ -96,7 +102,7 @@ npm install
 npm run dev
 ```
 
-> App runs at `http://localhost:5173`
+> The application will run at `http://localhost:5173`
 
 ### Production Build
 
@@ -107,14 +113,15 @@ npm run preview
 
 ---
 
-## ☁️ Deploying to Vercel
+## ☁️ Deployment (Vercel)
 
-1. Push your code to GitHub.
-2. Go to [Vercel](https://vercel.com) → “New Project” → Import Repository.
-3. Vercel detects Vite settings automatically.
-4. Click **Deploy** and get your live link (e.g., [weatherflow-react.vercel.app](https://weatherflow-react.vercel.app)).
+1. Push your repository to GitHub.
+2. Go to [Vercel](https://vercel.com), log in, and click **New Project**.
+3. Import your GitHub repository.
+4. Vercel automatically detects Vite configuration.
+5. Click **Deploy** to publish your app.
 
-Manual deployment:
+Manual deployment via CLI:
 
 ```bash
 npm install -g vercel
@@ -129,9 +136,9 @@ vercel
 src/
 ├── components/     # Reusable UI components
 ├── pages/          # Page components
-├── utils/          # API and helper functions
-├── assets/         # Images, icons
-├── App.jsx         # Root component
+├── utils/          # Helper functions & API handlers
+├── assets/         # Static assets (images, icons)
+├── App.jsx         # Main application component
 ├── main.jsx        # Entry point
 └── index.css       # Global styles
 ```
@@ -140,21 +147,24 @@ src/
 
 ## 🌍 Browser Support
 
-* Chrome, Firefox, Safari, Edge (latest 2 versions)
+* Chrome (latest 2 versions)
+* Firefox (latest 2 versions)
+* Safari (latest 2 versions)
+* Edge (latest 2 versions)
 
-> Note: Voice search may have limited support on some browsers.
+> Note: Voice search support may vary across browsers.
 
 ---
 
 ## ♿ Accessibility
 
-Compliant with **WCAG 2.1**:
+This app follows **WCAG 2.1** standards:
 
-* Semantic HTML
-* ARIA roles
-* Keyboard navigation
-* Color contrast
-* Focus visibility
+* Semantic HTML structure
+* Proper ARIA attributes
+* Full keyboard navigation
+* High color contrast
+* Clear focus states
 
 ---
 
@@ -166,33 +176,45 @@ Compliant with **WCAG 2.1**:
 
 Optimizations include:
 
-* Code splitting
-* Lazy loading
-* Caching
-* Optimized assets
+* Code splitting & lazy loading
+* Efficient caching
+* Minified assets
+* Responsive image loading
 
 ---
 
 ## 🤝 Contributing
 
-1. Fork the repo
-2. Create a branch (`git checkout -b feature/YourFeature`)
-3. Commit (`git commit -m 'Add feature'`)
-4. Push (`git push origin feature/YourFeature`)
+1. Fork this repository
+2. Create your feature branch:
+
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+3. Commit your changes:
+
+   ```bash
+   git commit -m "Add some AmazingFeature"
+   ```
+4. Push to the branch:
+
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
 5. Open a Pull Request
 
 ---
 
 ## 🪪 License
 
-This project is licensed under the **MIT License** – see [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 💙 Acknowledgments
 
-* [Open-Meteo](https://open-meteo.com/)
-* [OpenStreetMap](https://www.openstreetmap.org/)
-* [Tailwind CSS](https://tailwindcss.com/)
-* [Framer Motion](https://www.framer.com/motion/)
-* [Lucide Icons](https://lucide.dev/)
+* [Open-Meteo](https://open-meteo.com/) — Free weather API
+* [OpenStreetMap](https://www.openstreetmap.org/) — Geocoding services
+* [Tailwind CSS](https://tailwindcss.com/) — Modern CSS framework
+* [Framer Motion](https://www.framer.com/motion/) — Animation library
+* [Lucide Icons](https://lucide.dev/) — Icon pack
